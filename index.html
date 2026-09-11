@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Binance Taker Scanner</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#121933; --panel2:#0f1630; --text:#eef2ff;
+      --muted:#9aa4c7; --line:#253052; --green:#25d07f; --red:#ff5f6d;
+      --yellow:#f4c95d; --blue:#6ea8fe; --chip:#1a2344;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .wrap{max-width:1450px;margin:auto;padding:18px}
+    h1{font-size:1.55rem;margin:0 0 6px}
+    .sub{color:var(--muted);font-size:.95rem;margin-bottom:16px;line-height:1.7}
+    .controls{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;background:var(--panel);padding:14px;border:1px solid var(--line);border-radius:14px}
+    label{font-size:.78rem;color:var(--muted);display:block;margin-bottom:6px}
+    select,input,button{width:100%;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:10px;padding:10px;font-size:.92rem}
+    button{cursor:pointer;background:#2b62f4;border-color:#2b62f4;font-weight:700}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:12px 0}
+    .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+    .stat .k{color:var(--muted);font-size:.78rem}.stat .v{font-size:1.15rem;font-weight:800;margin-top:3px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+    .tab{width:auto;padding:8px 12px;background:var(--chip);border-color:var(--line)}
+    .tab.active{background:#314475}
+    .status{color:var(--muted);font-size:.9rem;margin:8px 0 12px;min-height:22px}
+    .progress{height:7px;background:var(--panel);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+    .progress > div{height:100%;width:0;background:var(--blue);transition:width .15s}
+    .tableWrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+    table{width:100%;border-collapse:collapse;min-width:1050px}
+    th,td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:.86rem;text-align:center;white-space:nowrap}
+    th{position:sticky;top:0;background:#151e3e;z-index:2;color:#cbd5ff;cursor:pointer}
+    tr:hover td{background:#151e33}
+    .sym{font-weight:800;text-align:right}
+    .buy{color:var(--green);font-weight:800}.sell{color:var(--red);font-weight:800}.mix{color:var(--yellow);font-weight:800}
+    .pos{color:var(--green)}.neg{color:var(--red)}
+    .badge{display:inline-block;border-radius:999px;padding:4px 8px;background:var(--chip)}
+    .note{margin-top:12px;color:var(--muted);font-size:.82rem;line-height:1.7}
+    .small{font-size:.76rem;color:var(--muted)}
+    @media(max-width:900px){
+      .controls{grid-template-columns:repeat(2,1fr)}
+      .stats{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>ماسح Taker Buy / Sell — Binance Spot</h1>
+  <div class="sub">
+    نفس حساب THE/USDT: نسبة الشراء = Taker Buy Quote Volume ÷ Quote Volume × 100.
+    لا توجد متوسطات، RSI، MACD أو أي مؤشرات إضافية.
+  </div>
+
+  <div class="controls">
+    <div>
+      <label>الفريم</label>
+      <select id="interval">
+        <option>1m</option><option>3m</option><option selected>5m</option><option>15m</option>
+        <option>30m</option><option>1h</option><option>2h</option><option>4h</option>
+        <option>6h</option><option>8h</option><option>12h</option><option>1d</option>
+      </select>
+    </div>
+    <div>
+      <label>الشمعة</label>
+      <select id="candleMode">
+        <option value="closed" selected>آخر شمعة مكتملة</option>
+        <option value="current">الشمعة الحالية</option>
+      </select>
+    </div>
+    <div>
+      <label>حد الإشارة %</label>
+      <input id="threshold" type="number" min="50" max="99" step="1" value="60">
+    </div>
+    <div>
+      <label>أقل فوليوم USDT للعرض</label>
+      <input id="minVolume" type="number" min="0" step="1000" value="0">
+    </div>
+    <div>
+      <label>بحث عن عملة</label>
+      <input id="search" placeholder="مثال: THE">
+    </div>
+    <div style="align-self:end">
+      <button id="scanBtn">ابدأ السكان</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="k">الأزواج المفحوصة</div><div id="sTotal" class="v">—</div></div>
+    <div class="stat"><div class="k">شراء قوي</div><div id="sBuy" class="v buy">—</div></div>
+    <div class="stat"><div class="k">بيع قوي</div><div id="sSell" class="v sell">—</div></div>
+    <div class="stat"><div class="k">مختلط</div><div id="sMix" class="v mix">—</div></div>
+    <div class="stat"><div class="k">آخر تحديث</div><div id="sTime" class="v" style="font-size:.95rem">—</div></div>
+  </div>
+
+  <div class="progress"><div id="bar"></div></div>
+  <div id="status" class="status">اختر الفريم واضغط «ابدأ السكان».</div>
+
+  <div class="tabs">
+    <button class="tab active" data-filter="all">الكل</button>
+    <button class="tab" data-filter="buy">شراء قوي</button>
+    <button class="tab" data-filter="sell">بيع قوي</button>
+    <button class="tab" data-filter="mix">مختلط</button>
+  </div>
+
+  <div class="tableWrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-sort="symbol">العملة</th>
+          <th data-sort="buyPct">Buy %</th>
+          <th data-sort="sellPct">Sell %</th>
+          <th data-sort="delta">Delta %</th>
+          <th data-sort="quoteVol">الفوليوم USDT</th>
+          <th data-sort="changePct">تغير الشمعة %</th>
+          <th data-sort="close">السعر</th>
+          <th data-sort="trades">عدد الصفقات</th>
+          <th data-sort="signal">الإشارة</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"><tr><td colspan="9" class="small">لا توجد بيانات بعد.</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    ملاحظة: الفوليوم المعروض هو قيمة تداول الشمعة بالـUSDT نفسها، بدون مقارنته بمتوسطات.
+    «شراء قوي» يعني Buy% أكبر من أو يساوي الحد الذي تختاره، و«بيع قوي» يعني Sell% أكبر من أو يساوي الحد.
+    الشمعة الحالية تتغير لحظيًا، لذلك آخر شمعة مكتملة أكثر ثباتًا.
+  </div>
+</div>
+
+<script>
+const BASES = [
+  "https://api.binance.com",
+  "https://api1.binance.com",
+  "https://api2.binance.com",
+  "https://api3.binance.com"
+];
+
+let rows = [];
+let activeFilter = "all";
+let sortKey = "strength";
+let sortDir = -1;
+let scanning = false;
+
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function fetchJSON(path) {
+  let lastErr;
+  for (const base of BASES) {
+    try {
+      const r = await fetch(base + path, {cache:"no-store"});
+      if (r.status === 429 || r.status === 418) {
+        throw new Error("RATE_LIMIT_" + r.status);
+      }
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return await r.json();
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error("تعذر الاتصال بـ Binance");
+}
+
+function formatNum(n, digits=2){
+  if (!Number.isFinite(n)) return "—";
+  return new Intl.NumberFormat("en-US",{maximumFractionDigits:digits}).format(n);
+}
+function formatPrice(n){
+  if (!Number.isFinite(n)) return "—";
+  if (n >= 100) return n.toFixed(2);
+  if (n >= 1) return n.toFixed(4);
+  if (n >= .01) return n.toFixed(6);
+  return n.toFixed(8);
+}
+function signalFor(buyPct, sellPct, threshold){
+  if (buyPct >= threshold) return "buy";
+  if (sellPct >= threshold) return "sell";
+  return "mix";
+}
+function signalLabel(s){
+  return s==="buy" ? "🟢 شراء قوي" : s==="sell" ? "🔴 بيع قوي" : "🟡 مختلط";
+}
+
+async function getSymbols(){
+  const info = await fetchJSON("/api/v3/exchangeInfo");
+  return info.symbols
+    .filter(s =>
+      s.status === "TRADING" &&
+      s.quoteAsset === "USDT" &&
+      s.isSpotTradingAllowed !== false
+    )
+    .map(s => s.symbol);
+}
+
+async function scanSymbol(symbol, interval, candleMode, threshold){
+  const k = await fetchJSON(`/api/v3/klines?symbol=${encodeURIComponent(symbol)}&interval=${encodeURIComponent(interval)}&limit=2`);
+  if (!Array.isArray(k) || k.length < 2) throw new Error("لا توجد شموع كافية");
+  const c = candleMode === "current" ? k[k.length-1] : k[k.length-2];
+
+  // Binance spot kline:
+  // 0 open time, 1 open, 2 high, 3 low, 4 close, 5 base volume,
+  // 7 quote volume, 8 trades, 9 taker buy base, 10 taker buy quote.
+  const open = Number(c[1]);
+  const close = Number(c[4]);
+  const quoteVol = Number(c[7]);
+  const trades = Number(c[8]);
+  const takerBuyQuote = Number(c[10]);
+
+  const buyPct = quoteVol > 0 ? (takerBuyQuote / quoteVol) * 100 : 0;
+  const sellPct = 100 - buyPct;
+  const delta = buyPct - sellPct;
+  const changePct = open > 0 ? ((close-open)/open)*100 : 0;
+  const signal = signalFor(buyPct, sellPct, threshold);
+
+  return {
+    symbol, buyPct, sellPct, delta, quoteVol, changePct, close, trades,
+    signal,
+    strength: Math.max(buyPct, sellPct),
+    openTime: c[0], closeTime: c[6]
+  };
+}
+
+async function runScan(){
+  if (scanning) return;
+  scanning = true;
+  $("scanBtn").disabled = true;
+  $("scanBtn").textContent = "جاري السكان...";
+  $("bar").style.width = "0%";
+  rows = [];
+  render();
+
+  const interval = $("interval").value;
+  const candleMode = $("candleMode").value;
+  const threshold = Math.max(50, Math.min(99, Number($("threshold").value) || 60));
+
+  try {
+    $("status").textContent = "جلب قائمة أزواج USDT من Binance...";
+    const symbols = await getSymbols();
+    $("sTotal").textContent = symbols.length;
+
+    let done = 0, failed = 0;
+    const concurrency = 8;
+    let cursor = 0;
+
+    async function worker(){
+      while(cursor < symbols.length){
+        const i = cursor++;
+        const sym = symbols[i];
+        try{
+          const r = await scanSymbol(sym, interval, candleMode, threshold);
+          rows.push(r);
+        }catch(e){
+          failed++;
+          if(String(e.message).includes("RATE_LIMIT")){
+            $("status").textContent = "Binance قيّد الطلبات مؤقتًا. تهدئة المسح قبل الاستمرار...";
+            await sleep(2500);
+          }
+        }finally{
+          done++;
+          $("bar").style.width = `${(done/symbols.length)*100}%`;
+          $("status").textContent = `تم فحص ${done} من ${symbols.length}${failed ? ` — تعذر ${failed}` : ""}`;
+          if(done % 12 === 0) render();
+        }
+        await sleep(25);
+      }
+    }
+
+    await Promise.all(Array.from({length:concurrency}, worker));
+    $("sTime").textContent = new Date().toLocaleString("ar-SA");
+    $("status").textContent = `اكتمل السكان: ${rows.length} زوج بنجاح${failed ? `، وتعذر ${failed}` : ""}.`;
+    render();
+  } catch(e){
+    console.error(e);
+    $("status").textContent = "تعذر الاتصال بـ Binance. جرّب مرة أخرى أو تأكد أن Binance API متاح في شبكتك.";
+  } finally {
+    scanning = false;
+    $("scanBtn").disabled = false;
+    $("scanBtn").textContent = "ابدأ السكان";
+  }
+}
+
+function filteredRows(){
+  const minVol = Number($("minVolume").value) || 0;
+  const q = $("search").value.trim().toUpperCase();
+  return rows.filter(r =>
+    (activeFilter==="all" || r.signal===activeFilter) &&
+    r.quoteVol >= minVol &&
+    (!q || r.symbol.includes(q))
+  );
+}
+
+function render(){
+  const threshold = Math.max(50, Math.min(99, Number($("threshold").value) || 60));
+
+  // Reclassify immediately if user changes threshold after scanning
+  rows.forEach(r => {
+    r.signal = signalFor(r.buyPct, r.sellPct, threshold);
+    r.strength = Math.max(r.buyPct, r.sellPct);
+  });
+
+  $("sBuy").textContent = rows.filter(r=>r.signal==="buy").length || "0";
+  $("sSell").textContent = rows.filter(r=>r.signal==="sell").length || "0";
+  $("sMix").textContent = rows.filter(r=>r.signal==="mix").length || "0";
+
+  const data = filteredRows().sort((a,b)=>{
+    let av=a[sortKey], bv=b[sortKey];
+    if(sortKey==="signal"){
+      const rank={buy:3,sell:2,mix:1}; av=rank[av]; bv=rank[bv];
+    }
+    if(typeof av === "string") return sortDir * av.localeCompare(bv);
+    return sortDir * ((av??0)-(bv??0));
+  });
+
+  const tb = $("tbody");
+  if(!data.length){
+    tb.innerHTML = `<tr><td colspan="9" class="small">لا توجد نتائج مطابقة.</td></tr>`;
+    return;
+  }
+
+  tb.innerHTML = data.map(r => `
+    <tr>
+      <td class="sym">${r.symbol.replace(/USDT$/,"/USDT")}</td>
+      <td class="buy">${r.buyPct.toFixed(1)}%</td>
+      <td class="sell">${r.sellPct.toFixed(1)}%</td>
+      <td class="${r.delta>=0?"pos":"neg"}">${r.delta>=0?"+":""}${r.delta.toFixed(1)}%</td>
+      <td>${formatNum(r.quoteVol,0)}</td>
+      <td class="${r.changePct>=0?"pos":"neg"}">${r.changePct>=0?"+":""}${r.changePct.toFixed(2)}%</td>
+      <td>${formatPrice(r.close)}</td>
+      <td>${formatNum(r.trades,0)}</td>
+      <td><span class="badge ${r.signal}">${signalLabel(r.signal)}</span></td>
+    </tr>
+  `).join("");
+}
+
+$("scanBtn").addEventListener("click", runScan);
+$("search").addEventListener("input", render);
+$("minVolume").addEventListener("input", render);
+$("threshold").addEventListener("input", render);
+
+document.querySelectorAll(".tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    activeFilter=btn.dataset.filter;
+    render();
+  });
+});
+
+document.querySelectorAll("th[data-sort]").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const k=th.dataset.sort;
+    if(sortKey===k) sortDir*=-1;
+    else { sortKey=k; sortDir = (k==="symbol" ? 1 : -1); }
+    render();
+  });
+});
+</script>
+</body>
+</html>
