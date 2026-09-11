@@ -1,23 +1,58 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Binance Manual Flow Scanner</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Binance Flow Scanner — Launch Radar</title>
 <style>
-:root{--bg:#08101e;--panel:#111a2e;--panel2:#0d1629;--line:#263450;--text:#edf3ff;--muted:#9caccc;--green:#32d583;--red:#ff6675;--yellow:#f5c75f;--blue:#72a7ff;--purple:#b899ff;--chip:#192541}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}.wrap{max-width:1600px;margin:auto;padding:18px}h1{font-size:1.55rem;margin:0 0 6px}.sub,.note{color:var(--muted);line-height:1.75}.sub{font-size:.92rem;margin-bottom:14px}.controls{display:grid;grid-template-columns:repeat(6,minmax(125px,1fr));gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}label{display:block;font-size:.77rem;color:var(--muted);margin-bottom:6px}select,input,button{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:.9rem}button{cursor:pointer;font-weight:750;background:#285eea;border-color:#285eea}button:disabled{opacity:.55;cursor:not-allowed}.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin:12px 0}.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px}.stat .k{font-size:.74rem;color:var(--muted)}.stat .v{font-size:1.08rem;font-weight:850;margin-top:4px}.buy{color:var(--green)!important}.sell{color:var(--red)!important}.absorb{color:var(--yellow)!important}.mix{color:#c8d2e9!important}.progress{height:7px;background:var(--panel);border:1px solid var(--line);border-radius:99px;overflow:hidden}.progress>div{height:100%;width:0;background:var(--blue);transition:width .15s}.status{min-height:24px;margin:8px 0 10px;color:var(--muted);font-size:.88rem}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.tab{width:auto;padding:8px 11px;background:var(--chip);border-color:var(--line)}.tab.active{background:#30466f}.tableWrap{overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px}table{border-collapse:collapse;width:100%;min-width:1550px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);font-size:.82rem;text-align:center;white-space:nowrap}th{position:sticky;top:0;z-index:2;background:#14203a;color:#d4def5;cursor:pointer}tr:hover td{background:#142035}.sym{text-align:right;font-weight:850}.pos{color:var(--green)}.neg{color:var(--red)}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--chip);font-weight:800}.reason{white-space:normal;min-width:300px;text-align:right;line-height:1.55}.small{font-size:.74rem;color:var(--muted)}.legend{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.legend>div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px;font-size:.78rem;line-height:1.55}.note{font-size:.8rem;margin-top:12px}.tag{font-size:.72rem;padding:2px 6px;border-radius:999px;background:var(--chip)}
-@media(max-width:1000px){.controls{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.legend{grid-template-columns:1fr 1fr}}
+:root{
+  --bg:#08101e;--panel:#111a2e;--panel2:#0d1629;--line:#263450;--text:#edf3ff;
+  --muted:#9caccc;--green:#32d583;--red:#ff6675;--yellow:#f5c75f;--blue:#72a7ff;
+  --purple:#b899ff;--chip:#192541;--orange:#ff9d4d
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}
+.wrap{max-width:1800px;margin:auto;padding:18px}
+h1{font-size:1.55rem;margin:0 0 6px}
+.sub,.note{color:var(--muted);line-height:1.75}.sub{font-size:.92rem;margin-bottom:14px}
+.controls{display:grid;grid-template-columns:repeat(6,minmax(125px,1fr));gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+label{display:block;font-size:.77rem;color:var(--muted);margin-bottom:6px}
+select,input,button{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:.9rem}
+button{cursor:pointer;font-weight:750;background:#285eea;border-color:#285eea}button:disabled{opacity:.55;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;margin:12px 0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px}.stat .k{font-size:.74rem;color:var(--muted)}.stat .v{font-size:1.08rem;font-weight:850;margin-top:4px}
+.buy{color:var(--green)!important}.sell{color:var(--red)!important}.absorb{color:var(--yellow)!important}.mix{color:#c8d2e9!important}.manual{color:var(--orange)!important}
+.progress{height:7px;background:var(--panel);border:1px solid var(--line);border-radius:99px;overflow:hidden}.progress>div{height:100%;width:0;background:var(--blue);transition:width .15s}
+.status{min-height:24px;margin:8px 0 10px;color:var(--muted);font-size:.88rem}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.tab{width:auto;padding:8px 11px;background:var(--chip);border-color:var(--line)}.tab.active{background:#30466f}
+.tableWrap{overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:2050px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);font-size:.81rem;text-align:center;white-space:nowrap;vertical-align:top}
+th{position:sticky;top:0;z-index:2;background:#14203a;color:#d4def5;cursor:pointer}
+tr:hover td{background:#142035}.sym{text-align:right;font-weight:850}.pos{color:var(--green)}.neg{color:var(--red)}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--chip);font-weight:800}
+.reason,.manualHint{white-space:normal;min-width:360px;text-align:right;line-height:1.55}.manualHint{min-width:290px}
+.small{font-size:.72rem;color:var(--muted)}.tag{font-size:.71rem;padding:2px 6px;border-radius:999px;background:var(--chip)}.score{font-size:1.05rem;font-weight:900}.rocket{color:#75f0b1!important}.late{color:#ff9d4d!important}
+.legend{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0}.legend>div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px;font-size:.78rem;line-height:1.55}
+.note{font-size:.8rem;margin-top:12px}
+@media(max-width:1050px){.controls{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.legend{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <div class="wrap">
-<h1>ماسح Binance — نفس التحليل اليدوي</h1>
-<div class="sub">يفحص جميع أزواج Spot/USDT بنفس منطق تحليل THE: يجمع آخر <b>3 شموع مكتملة</b> (جمع مباشر، بدون متوسط)، يحسب Taker Buy/Sell من Quote Volume، يراقب استجابة السعر، يقارن فوليوم آخر شمعة بالشمعتين السابقتين، ويفحص Futures Taker Buy/Sell كعامل تأكيد عندما تتوفر عقود للزوج.</div>
+<h1>ماسح Binance — رادار قرب الانطلاق</h1>
+<div class="sub">
+يفحص جميع أزواج <b>Spot/USDT</b> بنفس تسلسل القراءة اليدوية: آخر 3 شموع مكتملة مجمعة مباشرة، كل شمعة منفردة، الشمعة الحالية، استجابة السعر، موقع السعر داخل النطاق، فوليوم آخر شمعة مقارنة مباشرة بالشمعتين قبلها، ثم Futures Taker Buy/Sell كعامل تأكيد. <b>لا توجد متوسطات فوليوم.</b>
+</div>
 
 <div class="controls">
-  <div><label>الفريم</label><select id="interval"><option>1m</option><option>3m</option><option selected>5m</option><option>15m</option><option>30m</option><option>1h</option><option>2h</option><option>4h</option><option>6h</option><option>8h</option><option>12h</option><option>1d</option></select></div>
-  <div><label>حد الهيمنة الواضحة</label><select id="threshold"><option value="55" selected>55%</option><option value="60">60%</option><option value="65">65%</option><option value="70">70%</option></select></div>
+  <div><label>الفريم</label><select id="interval">
+    <option>1m</option><option>3m</option><option selected>5m</option><option>15m</option><option>30m</option>
+    <option>1h</option><option>2h</option><option>4h</option><option>6h</option><option>8h</option><option>12h</option><option>1d</option>
+  </select></div>
+  <div><label>حد الهيمنة الواضحة</label><select id="threshold">
+    <option value="55" selected>55%</option><option value="60">60%</option><option value="65">65%</option><option value="70">70%</option>
+  </select></div>
   <div><label>أقل فوليوم للنافذة (USDT)</label><input id="minVolume" type="number" min="0" step="1000" value="0"></div>
   <div><label>بحث عن عملة</label><input id="search" placeholder="مثال: THE"></div>
   <div><label>تأكيد العقود</label><select id="futuresMode"><option value="on" selected>تشغيل Futures confirmation</option><option value="off">Spot فقط</option></select></div>
@@ -30,41 +65,101 @@
   <div class="stat"><div class="k">تصريف واضح</div><div id="sSell" class="v sell">—</div></div>
   <div class="stat"><div class="k">امتصاص</div><div id="sAbsorb" class="v absorb">—</div></div>
   <div class="stat"><div class="k">مختلط</div><div id="sMix" class="v mix">—</div></div>
-  <div class="stat"><div class="k">آخر تحديث</div><div id="sTime" class="v" style="font-size:.86rem">—</div></div>
+  <div class="stat"><div class="k">يحتاج يدوي</div><div id="sManual" class="v manual">—</div></div>
+  <div class="stat"><div class="k">🚀 قرب الانطلاق</div><div id="sLaunch" class="v rocket">—</div></div>
+  <div class="stat"><div class="k">أفضل درجة</div><div id="sBest" class="v rocket">—</div></div>
+  <div class="stat"><div class="k">آخر تحديث</div><div id="sTime" class="v" style="font-size:.84rem">—</div></div>
 </div>
-<div class="progress"><div id="bar"></div></div><div id="status" class="status">اختر الفريم ثم ابدأ السكان.</div>
+
+<div class="progress"><div id="bar"></div></div>
+<div id="status" class="status">اختر الفريم ثم ابدأ السكان.</div>
 
 <div class="legend">
-  <div><b class="buy">🟢 شراء واضح</b><br>هيمنة شراء Spot + السعر يستجيب للأعلى + نشاط فوليوم مناسب، والعقود لا تعاكس بقوة.</div>
-  <div><b class="sell">🔴 تصريف واضح</b><br>هيمنة بيع Spot + السعر يستجيب للأسفل + نشاط فوليوم مناسب، والعقود لا تعاكس بقوة.</div>
-  <div><b class="absorb">🟡 امتصاص</b><br>هيمنة قوية لكن السعر لا يتحرك معها؛ مثال: 65% شراء والسعر لا يصعد = احتمال بائع يمتص الشراء.</div>
-  <div><b>⚪ مختلط</b><br>النسبة والسعر أو Spot وFutures لا يعطون اتجاهًا متفقًا.</div>
+  <div><b class="rocket">🚀 قريب من الانطلاق</b><br>شراء يدخل، السعر يستجيب بدون انفجار متأخر، قريب من القمة، والفوليوم/العقود لا يعاكسان بوضوح.</div>
+  <div><b class="buy">🟢 شراء واضح</b><br>هيمنة شراء في النافذة، السعر يستجيب، وآخر شمعة/الحالية لا تقلب التدفق بقوة.</div>
+  <div><b class="sell">🔴 تصريف واضح</b><br>هيمنة بيع في النافذة، السعر يضعف، وآخر شمعة/الحالية لا تقلب التدفق بقوة.</div>
+  <div><b class="absorb">🟡 امتصاص شراء</b><br>شراء هجومي قوي لكن السعر لا يستجيب؛ احتمال بائع كبير يمتص الشراء.</div>
+  <div><b class="absorb">🟡 امتصاص بيع</b><br>بيع هجومي قوي لكن السعر لا يهبط؛ احتمال مشترٍ كبير يمتص البيع.</div>
+  <div><b class="manual">🟠 يحتاج فحص يدوي</b><br>عندما تتعارض آخر شمعة أو الشمعة الحالية أو Futures مع اتجاه النافذة.</div>
 </div>
 
 <div class="tabs">
-  <button class="tab active" data-filter="all">الكل</button><button class="tab" data-filter="buy">شراء واضح</button><button class="tab" data-filter="sell">تصريف واضح</button><button class="tab" data-filter="absorb">امتصاص</button><button class="tab" data-filter="mix">مختلط</button>
+  <button class="tab active" data-filter="launch">🚀 Top 20 قرب الارتفاع</button>
+  <button class="tab" data-filter="all">الكل</button>
+  <button class="tab" data-filter="buy">شراء واضح</button>
+  <button class="tab" data-filter="sell">تصريف واضح</button>
+  <button class="tab" data-filter="absorb">امتصاص</button>
+  <button class="tab" data-filter="mix">مختلط</button>
+  <button class="tab" data-filter="manual">يحتاج فحص يدوي</button>
 </div>
 
 <div class="tableWrap"><table><thead><tr>
-<th data-sort="symbol">العملة</th><th data-sort="spotBuy">Spot Buy<br><span class="small">3 شموع</span></th><th data-sort="spotSell">Spot Sell</th><th data-sort="currentBuy">الشمعة الحالية<br>Buy</th><th data-sort="windowChange">حركة السعر<br>3 شموع</th><th data-sort="windowVol">فوليوم النافذة<br>USDT</th><th data-sort="volRatio">فوليوم آخر شمعة<br>مقارنة بالسابق</th><th>الموقع السعري</th><th data-sort="futuresBuy">Futures Buy</th><th data-sort="price">السعر</th><th data-sort="verdictRank">الحكم</th><th>السبب</th>
-</tr></thead><tbody id="tbody"><tr><td colspan="12" class="small">لا توجد بيانات بعد.</td></tr></tbody></table></div>
-<div class="note"><b>مهم:</b> لا يوجد أي متوسط فوليوم في الحساب. فوليوم آخر شمعة يُقارن مباشرة بالشمعتين المكتملتين قبلها. نافذة Spot = مجموع آخر 3 شموع مكتملة. إذا اخترت 5m فهذا يعادل آخر 15 دقيقة مكتملة، وهو نفس النوع من القراءة الذي استخدمته يدويًا مع THE. بيانات Futures تدعم فترات 5m فأعلى؛ عند اختيار 1m أو 3m يستخدم التأكيد 5m فقط.</div>
+  <th data-sort="symbol">العملة</th>
+  <th data-sort="launchScore">درجة قرب الارتفاع</th>
+  <th data-sort="launchRank">الحالة</th>
+  <th data-sort="spotBuy">Spot Buy<br><span class="small">3 شموع</span></th>
+  <th>تسلسل آخر 3<br><span class="small">Buy%</span></th>
+  <th data-sort="currentBuy">الحالية<br>Buy%</th>
+  <th data-sort="windowChange">حركة السعر</th>
+  <th data-sort="windowVol">فوليوم النافذة<br>USDT</th>
+  <th data-sort="volRatio">آخر شمعة ÷<br>أكبر السابقة</th>
+  <th>الموقع السعري</th>
+  <th data-sort="futuresBuy">Futures 3 فترات<br>Buy%</th>
+  <th data-sort="futuresLatestBuy">Futures الأخيرة<br>Buy%</th>
+  <th data-sort="price">السعر</th>
+  <th data-sort="verdictRank">الحكم</th>
+  <th data-sort="manualNeeded">فحص يدوي؟</th>
+  <th>التفسير بنفس القراءة اليدوية</th>
+  <th>ماذا أفحص يدويًا؟</th>
+</tr></thead>
+<tbody id="tbody"><tr><td colspan="17" class="small">لا توجد بيانات بعد.</td></tr></tbody></table></div>
+
+<div class="note">
+<b>مهم:</b> درجة قرب الارتفاع ليست توقعًا مضمونًا؛ هي أداة ترتيب للمرشحين. تعطي نقاطًا لتدفق الشراء، استجابة سعرية مبكرة، قرب القمة، نشاط الفوليوم المباشر، وعدم وجود امتصاص/تعارض، وتخصم إذا كانت الحركة متأخرة أو انقلبت الحالية للبيع. نافذة Spot = مجموع آخر 3 شموع مكتملة. إذا اخترت 5m فهذا يعني آخر 15 دقيقة مكتملة. Buy/Sell محسوب من Quote Volume وTaker Buy Quote Volume مباشرة. فوليوم آخر شمعة لا يقارن بمتوسط؛ فقط بأكبر فوليوم من الشمعتين المكتملتين قبلها. الشمعة الحالية غير مكتملة، لذلك تستخدم لرصد التحول ولا تعامل كشمعة نهائية.
+</div>
 </div>
 
 <script>
 const SPOT_BASES=["https://api.binance.com","https://api1.binance.com","https://api2.binance.com","https://api3.binance.com"];
 const FUT_BASE="https://fapi.binance.com";
-let rows=[],activeFilter="all",sortKey="verdictRank",sortDir=-1,scanning=false,futuresSymbols=new Set();
-const $=id=>document.getElementById(id); const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let rows=[],activeFilter="launch",sortKey="launchScore",sortDir=-1,scanning=false,futuresSymbols=new Set();
 
-async function fetchSpot(path){let err;for(const b of SPOT_BASES){try{const r=await fetch(b+path,{cache:"no-store"});if(r.status===418||r.status===429)throw new Error("RATE_LIMIT");if(!r.ok)throw new Error("HTTP "+r.status);return await r.json()}catch(e){err=e}}throw err||new Error("Spot unavailable")}
-async function fetchFutures(path){const r=await fetch(FUT_BASE+path,{cache:"no-store"});if(r.status===418||r.status===429)throw new Error("RATE_LIMIT");if(!r.ok)throw new Error("HTTP "+r.status);return await r.json()}
+const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function fetchSpot(path){
+  let err;
+  for(const b of SPOT_BASES){
+    try{
+      const r=await fetch(b+path,{cache:"no-store"});
+      if(r.status===418||r.status===429) throw new Error("RATE_LIMIT");
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      return await r.json();
+    }catch(e){err=e}
+  }
+  throw err||new Error("Spot unavailable");
+}
+async function fetchFutures(path){
+  const r=await fetch(FUT_BASE+path,{cache:"no-store"});
+  if(r.status===418||r.status===429) throw new Error("RATE_LIMIT");
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return await r.json();
+}
+
 function fmt(n,d=1){return Number.isFinite(n)?new Intl.NumberFormat("en-US",{maximumFractionDigits:d}).format(n):"—"}
-function priceFmt(n){if(!Number.isFinite(n))return"—";if(n>=100)return n.toFixed(2);if(n>=1)return n.toFixed(4);if(n>=.01)return n.toFixed(6);return n.toFixed(8)}
+function priceFmt(n){
+  if(!Number.isFinite(n))return"—";
+  if(n>=100)return n.toFixed(2); if(n>=1)return n.toFixed(4); if(n>=.01)return n.toFixed(6); return n.toFixed(8);
+}
 function pct(n,d=1){return Number.isFinite(n)?`${n>=0?"+":""}${n.toFixed(d)}%`:"—"}
 function kObj(c){return{open:Number(c[1]),high:Number(c[2]),low:Number(c[3]),close:Number(c[4]),baseVol:Number(c[5]),quoteVol:Number(c[7]),trades:Number(c[8]),takerBuyQuote:Number(c[10]),openTime:c[0],closeTime:c[6]}}
 function buyPct(c){return c.quoteVol>0?c.takerBuyQuote/c.quoteVol*100:0}
-function futuresPeriod(interval){const map={"1m":"5m","3m":"5m","5m":"5m","15m":"15m","30m":"30m","1h":"1h","2h":"2h","4h":"4h","6h":"6h","8h":"6h","12h":"12h","1d":"1d"};return map[interval]||"5m"}
+function futuresPeriod(interval){
+  const map={"1m":"5m","3m":"5m","5m":"5m","15m":"15m","30m":"30m","1h":"1h","2h":"2h","4h":"4h","6h":"6h","8h":"6h","12h":"12h","1d":"1d"};
+  return map[interval]||"5m";
+}
+function sideLabel(p){return p>=50?`شراء ${p.toFixed(1)}%`:`بيع ${(100-p).toFixed(1)}%`}
+function near(a,b,tol){return Math.abs(a-b)<=tol}
 
 async function getUniverse(){
   const [spot,fut]=await Promise.all([
@@ -75,99 +170,504 @@ async function getUniverse(){
   return spot.symbols.filter(s=>s.status==="TRADING"&&s.quoteAsset==="USDT"&&s.isSpotTradingAllowed!==false).map(s=>s.symbol);
 }
 
+function buildManualContext(x,threshold){
+  const reasons=[];
+  const hints=[];
+  let manual=false;
+
+  const latestBuy=x.last3Buys[2];
+  const currentBuy=x.currentBuy;
+
+  if(x.spotBuy>=threshold && latestBuy < 50){
+    manual=true; reasons.push("النافذة تميل للشراء لكن آخر شمعة مكتملة تحولت للبيع");
+    hints.push("افتح آخر شمعة مكتملة: إذا استمر Sell% فوق 55–60% والسعر بدأ يفقد القاع السابق، اعتبر الشراء يضعف");
+  }
+  if(x.spotSell>=threshold && latestBuy > 50){
+    manual=true; reasons.push("النافذة تميل للبيع لكن آخر شمعة مكتملة تحولت للشراء");
+    hints.push("افتح آخر شمعة مكتملة: إذا استمر Buy% فوق 55–60% والسعر استعاد القمة السابقة، التصريف قد يكون انتهى");
+  }
+
+  if(x.spotBuy>=threshold && currentBuy <= 100-threshold){
+    manual=true; reasons.push("الشمعة الحالية تقلب بقوة إلى البيع");
+    hints.push("انتظر اكتمال الحالية أو راقب الدقيقة الأخيرة؛ إذا بقي البيع مسيطرًا مع نزول السعر فهذا تحول قصير المدى للبيع");
+  }
+  if(x.spotSell>=threshold && currentBuy >= threshold){
+    manual=true; reasons.push("الشمعة الحالية تقلب بقوة إلى الشراء");
+    hints.push("انتظر اكتمال الحالية أو راقب الدقيقة الأخيرة؛ إذا بقي الشراء مسيطرًا مع صعود السعر فهذا تحول قصير المدى للشراء");
+  }
+
+  if(Number.isFinite(x.futuresBuy)){
+    if(x.spotBuy>=threshold && x.futuresBuy <= 100-threshold){
+      manual=true; reasons.push("Futures يعاكس شراء Spot");
+      hints.push("إذا Spot يصعد بينما Futures بيع قوي، لا تدخل فقط على النسبة؛ راقب هل السعر قادر على تثبيت الاختراق");
+    }
+    if(x.spotSell>=threshold && x.futuresBuy >= threshold){
+      manual=true; reasons.push("Futures يعاكس بيع Spot");
+      hints.push("إذا Spot يهبط بينما Futures شراء قوي، راقب هل الكسر يثبت أم يحصل ارتداد سريع");
+    }
+  }
+
+  if(x.decision.type==="absorb"){
+    manual=true;
+    if(x.decision.dir==="sellrisk"){
+      hints.push("في الامتصاص الشرائي: راقب هل Buy% يبقى مرتفعًا بينما السعر يفشل في صنع قمة جديدة؛ هذا يرجح وجود بائع يمتص الشراء");
+    }else{
+      hints.push("في الامتصاص البيعي: راقب هل Sell% يبقى مرتفعًا بينما السعر يفشل في صنع قاع جديد؛ هذا يرجح وجود مشترٍ يمتص البيع");
+    }
+  }
+
+  if(x.decision.type==="mix"){
+    manual=true;
+    if(!hints.length) hints.push("قارن آخر شمعتين: الاتجاه الذي يجمع هيمنة Taker مع حركة السعر هو الاتجاه الأهم؛ إذا لم يتفقا اترك العملة");
+  }
+
+  if(Math.abs(x.windowChange)<0.10 && (x.spotBuy>=threshold || x.spotSell>=threshold)){
+    manual=true; reasons.push("السعر شبه ثابت رغم هيمنة Taker");
+    hints.push("ثبات السعر مع هيمنة قوية علامة امتصاص محتملة؛ لا تعتبر النسبة وحدها دخولًا أو خروجًا");
+  }
+
+  return {
+    manual,
+    manualReasons:reasons,
+    manualHint:[...new Set(hints)].join(" • ") || "لا يحتاج فحصًا إضافيًا؛ التدفق والسعر متوافقان حاليًا."
+  };
+}
+
 function spotDecision(x,threshold){
   const buyDom=x.spotBuy>=threshold, sellDom=x.spotSell>=threshold;
-  const priceUp=x.windowChange>0 || x.breakout, priceDown=x.windowChange<0 || x.breakdown;
-  const currentBuy=x.currentBuy>=threshold, currentSell=x.currentSell>=threshold;
+  const latestBuy=x.last3Buys[2];
+  const latestSell=100-latestBuy;
+
+  const priceUp=x.breakout || x.windowChange>=0.10 || x.bandPosition>=0.75;
+  const priceDown=x.breakdown || x.windowChange<=-0.10 || x.bandPosition<=0.25;
+  const priceFlat=Math.abs(x.windowChange)<0.10 && !x.breakout && !x.breakdown;
+
+  const lastConfirmsBuy=latestBuy>=55;
+  const lastConfirmsSell=latestSell>=55;
+  const currentStrongBuy=x.currentBuy>=threshold;
+  const currentStrongSell=x.currentSell>=threshold;
+  const currentOpposesBuy=x.currentSell>=threshold;
+  const currentOpposesSell=x.currentBuy>=threshold;
   const volActive=x.volStandout || x.currentVolAlreadyLarge;
-  if(buyDom && !priceUp) return {type:"absorb",dir:"sellrisk",rank:2,label:"🟡 امتصاص شراء",reason:"شراء هجومي قوي لكن السعر لا يستجيب للأعلى؛ احتمال بائع يمتص الشراء"};
-  if(sellDom && !priceDown) return {type:"absorb",dir:"buyrisk",rank:2,label:"🟡 امتصاص بيع",reason:"بيع هجومي قوي لكن السعر لا يستجيب للأسفل؛ احتمال مشترٍ يمتص البيع"};
-  if(buyDom && priceUp && volActive) return {type:"buy",dir:"buy",rank:4,label:"🟢 شراء واضح",reason:"Spot شراء مهيمن + السعر صاعد + الفوليوم نشط"};
-  if(sellDom && priceDown && volActive) return {type:"sell",dir:"sell",rank:4,label:"🔴 تصريف واضح",reason:"Spot بيع مهيمن + السعر هابط + الفوليوم نشط"};
-  if(buyDom && priceUp && currentBuy) return {type:"buy",dir:"buy",rank:3,label:"🟢 شراء واضح",reason:"Spot شراء مهيمن + السعر صاعد + الشمعة الحالية تؤكد الشراء"};
-  if(sellDom && priceDown && currentSell) return {type:"sell",dir:"sell",rank:3,label:"🔴 تصريف واضح",reason:"Spot بيع مهيمن + السعر هابط + الشمعة الحالية تؤكد البيع"};
-  return {type:"mix",dir:"mix",rank:1,label:"⚪ مختلط",reason:"النسبة والسعر/الفوليوم لا يعطون تأكيدًا متفقًا"};
+
+  if(buyDom && (priceFlat || (!priceUp && x.windowChange<=0))){
+    return {type:"absorb",dir:"sellrisk",rank:3,label:"🟡 امتصاص شراء",reason:"شراء Spot مهيمن لكن السعر لا يستجيب للأعلى؛ احتمال بائع يمتص الشراء"};
+  }
+  if(sellDom && (priceFlat || (!priceDown && x.windowChange>=0))){
+    return {type:"absorb",dir:"buyrisk",rank:3,label:"🟡 امتصاص بيع",reason:"بيع Spot مهيمن لكن السعر لا يستجيب للأسفل؛ احتمال مشترٍ يمتص البيع"};
+  }
+
+  if(buyDom && priceUp){
+    if(currentOpposesBuy || latestSell>=threshold){
+      return {type:"mix",dir:"buyweak",rank:2,label:"🟠 شراء يضعف",reason:"النافذة شرائية والسعر صاعد، لكن آخر/الحالية تحولت إلى بيع قوي"};
+    }
+    if((lastConfirmsBuy || currentStrongBuy) && volActive){
+      return {type:"buy",dir:"buy",rank:6,label:"🟢 شراء واضح",reason:"هيمنة شراء Spot + استجابة سعرية للأعلى + آخر/الحالية تؤكد + فوليوم نشط"};
+    }
+    if(lastConfirmsBuy || currentStrongBuy){
+      return {type:"buy",dir:"buy",rank:5,label:"🟢 شراء واضح",reason:"هيمنة شراء Spot + السعر يستجيب للأعلى + آخر/الحالية تؤكد الشراء"};
+    }
+    return {type:"mix",dir:"buylean",rank:2,label:"⚪ ميل شراء",reason:"النافذة شرائية والسعر إيجابي، لكن آخر شمعة والحالية لا تعطيان تأكيدًا كافيًا"};
+  }
+
+  if(sellDom && priceDown){
+    if(currentOpposesSell || latestBuy>=threshold){
+      return {type:"mix",dir:"sellweak",rank:2,label:"🟠 التصريف يضعف",reason:"النافذة بيعية والسعر هابط، لكن آخر/الحالية تحولت إلى شراء قوي"};
+    }
+    if((lastConfirmsSell || currentStrongSell) && volActive){
+      return {type:"sell",dir:"sell",rank:6,label:"🔴 تصريف واضح",reason:"هيمنة بيع Spot + استجابة سعرية للأسفل + آخر/الحالية تؤكد + فوليوم نشط"};
+    }
+    if(lastConfirmsSell || currentStrongSell){
+      return {type:"sell",dir:"sell",rank:5,label:"🔴 تصريف واضح",reason:"هيمنة بيع Spot + السعر يستجيب للأسفل + آخر/الحالية تؤكد البيع"};
+    }
+    return {type:"mix",dir:"selllean",rank:2,label:"⚪ ميل بيع",reason:"النافذة بيعية والسعر سلبي، لكن آخر شمعة والحالية لا تعطيان تأكيدًا كافيًا"};
+  }
+
+  if(currentStrongBuy && x.currentPriceChange>0 && x.currentVolAlreadyLarge){
+    return {type:"mix",dir:"transitionbuy",rank:2,label:"🟠 تحوّل شراء جاري",reason:"النافذة لم تتأكد بعد، لكن الشمعة الحالية فيها شراء قوي مع ارتفاع السعر وفوليوم كبير"};
+  }
+  if(currentStrongSell && x.currentPriceChange<0 && x.currentVolAlreadyLarge){
+    return {type:"mix",dir:"transitionsell",rank:2,label:"🟠 تحوّل بيع جاري",reason:"النافذة لم تتأكد بعد، لكن الشمعة الحالية فيها بيع قوي مع هبوط السعر وفوليوم كبير"};
+  }
+
+  return {type:"mix",dir:"mix",rank:1,label:"⚪ مختلط",reason:"Taker والسعر وتسلسل الشموع لا يعطون اتجاهًا متفقًا"};
+}
+
+
+function scoreLaunch(x,threshold){
+  let score=0;
+  const why=[];
+  const risk=[];
+
+  // 30 points: Spot taker flow + persistence across the three completed candles.
+  let flow=Math.max(0,Math.min(22.5,(x.spotBuy-50)*1.5));
+  const persistent=x.last3Buys.filter(v=>v>=55).length;
+  flow+=persistent*2.5;
+  flow=Math.min(30,flow);
+  score+=flow;
+  if(flow>=20) why.push(`تدفق Spot قوي ${x.spotBuy.toFixed(1)}% شراء`);
+  else if(flow>=12) why.push(`تدفق Spot يميل للشراء ${x.spotBuy.toFixed(1)}%`);
+
+  // 20 points: early price response. Reward controlled rise, not an already-extended move.
+  let response=0;
+  if(x.windowChange>=0.15 && x.windowChange<=1.50) response=20;
+  else if(x.windowChange>=0 && x.windowChange<0.15) response=12;
+  else if(x.windowChange>1.50 && x.windowChange<=2.50) response=12;
+  else if(x.windowChange>-0.35 && x.windowChange<0) response=5;
+  score+=response;
+  if(response>=12) why.push(`السعر يستجيب مبكرًا ${x.windowChange>=0?"+":""}${x.windowChange.toFixed(2)}%`);
+
+  // 15 points: distance to the recent high / breakout proximity.
+  let proximity=0;
+  if(x.breakout && x.windowChange<=2.5) proximity=15;
+  else if(x.distanceToHighPct<=0.25) proximity=15;
+  else if(x.distanceToHighPct<=0.50) proximity=13;
+  else if(x.distanceToHighPct<=1.00) proximity=10;
+  else if(x.distanceToHighPct<=1.50) proximity=6;
+  score+=proximity;
+  if(proximity>=10) why.push(x.breakout ? "اختراق النطاق" : `قريب من القمة ${x.distanceToHighPct.toFixed(2)}%`);
+
+  // 15 points: direct volume movement only, no averages.
+  let volumePts=0;
+  if(x.volRatio>=2) volumePts=15;
+  else if(x.volRatio>=1.5) volumePts=12;
+  else if(x.volRatio>=1.2) volumePts=9;
+  else if(x.volRatio>=1.0) volumePts=6;
+  if(x.currentVolAlreadyLarge) volumePts=Math.min(15,volumePts+3);
+  score+=volumePts;
+  if(volumePts>=9) why.push(`الفوليوم نشط ${x.volRatio.toFixed(2)}×`);
+
+  // 10 points: clean response / no absorption.
+  let quality=0;
+  if(x.decision.type!=="absorb" && x.spotBuy>=55 && x.windowChange>=0) quality=10;
+  else if(x.decision.type!=="absorb" && x.spotBuy>=52) quality=5;
+  score+=quality;
+
+  // 10 points: Futures confirmation. Neutral if unavailable.
+  let fut=4;
+  if(Number.isFinite(x.futuresBuy)){
+    fut=0;
+    if(x.futuresBuy>=60) fut+=7;
+    else if(x.futuresBuy>=55) fut+=5;
+    else if(x.futuresBuy>=50) fut+=3;
+    if(x.futuresLatestBuy>=60) fut=Math.min(10,fut+3);
+    else if(x.futuresLatestBuy>=55) fut=Math.min(10,fut+2);
+    if(x.futuresSell>=60){
+      fut=0; risk.push("Futures يعاكس الشراء");
+    }
+  }
+  score+=fut;
+  if(fut>=7) why.push("Futures يؤكد");
+
+  // Penalties for late entry / reversal / absorption.
+  let penalty=0;
+  if(x.windowChange>2.5){
+    const p=Math.min(22,8+(x.windowChange-2.5)*5);
+    penalty+=p; risk.push(`الحركة متأخرة +${x.windowChange.toFixed(2)}%`);
+  }
+  if(x.currentSell>=60){ penalty+=15; risk.push(`الحالية ${x.currentSell.toFixed(1)}% بيع`); }
+  if((100-x.last3Buys[2])>=60){ penalty+=10; risk.push("آخر شمعة مكتملة بيعية"); }
+  if(x.decision.type==="absorb"){ penalty+=18; risk.push("احتمال امتصاص"); }
+  if(Number.isFinite(x.futuresSell) && x.futuresSell>=60){ penalty+=10; }
+  if(x.bandPosition<0.35 && !x.breakout){ penalty+=5; risk.push("بعيد عن قمة النطاق"); }
+
+  score=Math.max(0,Math.min(100,score-penalty));
+
+  const late=x.windowChange>=3 || x.currentPriceChange>=2;
+  let label,rank;
+  if(late && score>=45){ label="⚠️ شراء متأخر"; rank=2; }
+  else if(score>=78){ label="🚀 قريب من الانطلاق"; rank=5; }
+  else if(score>=65){ label="🟢 تجميع شرائي"; rank=4; }
+  else if(score>=52){ label="🟡 مراقبة"; rank=3; }
+  else { label="⚪ غير مرشح"; rank=1; }
+
+  return {
+    score:Math.round(score),
+    label,rank,
+    reason:(why.length?why.join(" + "):"لا توجد عوامل شراء كافية") + (risk.length?` | مخاطر: ${[...new Set(risk)].join("، ")}`:"")
+  };
 }
 
 function applyFutures(dec,x,threshold){
   if(!Number.isFinite(x.futuresBuy)) return dec;
-  const fb=x.futuresBuy, fs=100-fb;
+  const fb=x.futuresBuy, fs=100-fb, flb=x.futuresLatestBuy, fls=100-flb;
+
+  if(dec.type==="absorb"){
+    const extra = fb>=threshold ? "؛ Futures يميل للشراء" : fs>=threshold ? "؛ Futures يميل للبيع" : "؛ Futures مختلط";
+    return {...dec,reason:dec.reason+extra};
+  }
+
   if(dec.dir==="buy"){
-    if(fs>=threshold) return {type:"mix",dir:"mix",rank:1,label:"⚪ مختلط",reason:dec.reason+"، لكن Futures يميل بقوة للبيع"};
-    if(fb>=threshold) return {...dec,rank:5,reason:dec.reason+" + Futures يؤكد الشراء"};
-    return {...dec,reason:dec.reason+" + Futures محايد تقريبًا"};
+    if(fs>=threshold && fls>=55) return {type:"mix",dir:"conflict",rank:2,label:"🟠 تعارض Spot/Futures",reason:dec.reason+"، لكن Futures آخر 3 فترات يميل للبيع وآخر فترة لا تؤكد الشراء"};
+    if(fb>=threshold || flb>=threshold) return {...dec,rank:7,reason:dec.reason+" + Futures يؤكد الشراء"};
+    return {...dec,reason:dec.reason+" + Futures غير حاسم"};
   }
   if(dec.dir==="sell"){
-    if(fb>=threshold) return {type:"mix",dir:"mix",rank:1,label:"⚪ مختلط",reason:dec.reason+"، لكن Futures يميل بقوة للشراء"};
-    if(fs>=threshold) return {...dec,rank:5,reason:dec.reason+" + Futures يؤكد البيع"};
-    return {...dec,reason:dec.reason+" + Futures محايد تقريبًا"};
+    if(fb>=threshold && flb>=55) return {type:"mix",dir:"conflict",rank:2,label:"🟠 تعارض Spot/Futures",reason:dec.reason+"، لكن Futures آخر 3 فترات يميل للشراء وآخر فترة لا تؤكد البيع"};
+    if(fs>=threshold || fls>=threshold) return {...dec,rank:7,reason:dec.reason+" + Futures يؤكد البيع"};
+    return {...dec,reason:dec.reason+" + Futures غير حاسم"};
   }
   return dec;
+}
+
+function buildNarrative(x){
+  const seq=x.last3Buys.map((b,i)=>`ش${i+1}: ${b.toFixed(1)}% شراء`).join(" | ");
+  let t=`آخر 3 شموع Spot مجتمعة: شراء ${x.spotBuy.toFixed(1)}% / بيع ${x.spotSell.toFixed(1)}%. `;
+  t+=`التسلسل: ${seq}. الحالية: شراء ${x.currentBuy.toFixed(1)}% / بيع ${x.currentSell.toFixed(1)}%. `;
+  t+=`السعر ${pct(x.windowChange,2)} خلال النافذة وهو ${x.location}. `;
+  if(x.volStandout) t+=`فوليوم آخر شمعة المكتملة بارز: ${x.volRatio.toFixed(2)}× من أكبر الشمعتين قبلها. `;
+  else t+=`فوليوم آخر شمعة ${x.volRatio.toFixed(2)}× من أكبر الشمعتين قبلها، لذلك ليس اندفاعًا بارزًا وحده. `;
+  if(Number.isFinite(x.futuresBuy)){
+    t+=`Futures (${x.futuresPeriod}) آخر 3 فترات: شراء ${x.futuresBuy.toFixed(1)}%، وآخر فترة ${x.futuresLatestBuy.toFixed(1)}%. `;
+  }
+  t+=`الحكم: ${x.decision.reason}. `;
+  if(x.launch) t+=`رادار الارتفاع: ${x.launch.score}/100 — ${x.launch.label}. ${x.launch.reason}.`;
+  return t;
 }
 
 async function scanSpot(symbol,interval,threshold){
   // 6 candles: 5 completed context candles + current candle.
   const raw=await fetchSpot(`/api/v3/klines?symbol=${encodeURIComponent(symbol)}&interval=${encodeURIComponent(interval)}&limit=6`);
-  if(!Array.isArray(raw)||raw.length<5)throw new Error("not enough candles");
+  if(!Array.isArray(raw)||raw.length<5) throw new Error("not enough candles");
+
   const ks=raw.map(kObj), current=ks[ks.length-1], closed=ks.slice(0,-1);
-  const last3=closed.slice(-3), prev2=closed.slice(-5,-3);
-  const windowVol=last3.reduce((s,c)=>s+c.quoteVol,0), windowBuy=last3.reduce((s,c)=>s+c.takerBuyQuote,0);
+  const last3=closed.slice(-3);
+
+  const windowVol=last3.reduce((s,c)=>s+c.quoteVol,0);
+  const windowBuy=last3.reduce((s,c)=>s+c.takerBuyQuote,0);
   const spotBuy=windowVol>0?windowBuy/windowVol*100:0, spotSell=100-spotBuy;
+  const last3Buys=last3.map(buyPct);
+
   const currentBuy=buyPct(current), currentSell=100-currentBuy;
-  const start=last3[0].open, price=current.close, windowChange=start>0?(price-start)/start*100:0;
-  const priorHigh=Math.max(...last3.map(c=>c.high)), priorLow=Math.min(...last3.map(c=>c.low));
+  const start=last3[0].open, price=current.close;
+  const windowChange=start>0?(price-start)/start*100:0;
+  const currentPriceChange=current.open>0?(current.close-current.open)/current.open*100:0;
+
+  const priorHigh=Math.max(...last3.map(c=>c.high));
+  const priorLow=Math.min(...last3.map(c=>c.low));
+  const range=Math.max(priorHigh-priorLow, Number.EPSILON);
+  const bandPosition=Math.max(0,Math.min(1,(price-priorLow)/range));
   const breakout=price>priorHigh, breakdown=price<priorLow;
+  const distanceToHighPct=breakout ? 0 : (price>0 ? Math.max(0,(priorHigh-price)/price*100) : 999);
+
   const latest=last3[2], older1=last3[1], older2=last3[0];
-  const prevMax=Math.max(older1.quoteVol,older2.quoteVol), volRatio=prevMax>0?latest.quoteVol/prevMax:0;
+  const prevMax=Math.max(older1.quoteVol,older2.quoteVol);
+  const volRatio=prevMax>0?latest.quoteVol/prevMax:0;
   const volStandout=latest.quoteVol>older1.quoteVol && latest.quoteVol>older2.quoteVol;
   const currentVolAlreadyLarge=current.quoteVol>latest.quoteVol && current.quoteVol>older1.quoteVol;
-  const location=breakout?"اختراق أعلى النطاق":breakdown?"كسر أسفل النطاق":price>=priorHigh*.998?"قرب أعلى النطاق":price<=priorLow*1.002?"قرب أسفل النطاق":"داخل النطاق";
-  const x={symbol,spotBuy,spotSell,currentBuy,currentSell,windowChange,windowVol,latestVol:latest.quoteVol,volRatio,volStandout,currentVolAlreadyLarge,currentVol:current.quoteVol,price,breakout,breakdown,priorHigh,priorLow,location,futuresBuy:NaN,futuresSell:NaN,futuresPeriod:"—"};
-  x.decision=spotDecision(x,threshold); return x;
+
+  const location=breakout?"فوق أعلى النطاق":
+    breakdown?"تحت أدنى النطاق":
+    bandPosition>=0.80?"قرب أعلى النطاق":
+    bandPosition<=0.20?"قرب أسفل النطاق":"داخل منتصف النطاق";
+
+  const x={
+    symbol,spotBuy,spotSell,last3Buys,currentBuy,currentSell,windowChange,currentPriceChange,windowVol,
+    latestVol:latest.quoteVol,volRatio,volStandout,currentVolAlreadyLarge,currentVol:current.quoteVol,
+    price,breakout,breakdown,priorHigh,priorLow,bandPosition,distanceToHighPct,location,
+    futuresBuy:NaN,futuresSell:NaN,futuresLatestBuy:NaN,futuresLatestSell:NaN,futuresPeriod:"—",
+    manualNeeded:false,manualHint:"",narrative:""
+  };
+
+  x.decision=spotDecision(x,threshold);
+  x.launch=scoreLaunch(x,threshold);
+  x.launchScore=x.launch.score;
+  x.launchRank=x.launch.rank;
+  Object.assign(x,buildManualContext(x,threshold));
+  x.narrative=buildNarrative(x);
+  return x;
 }
 
 async function addFutures(x,interval,threshold){
-  if(!futuresSymbols.has(x.symbol))return x;
+  if(!futuresSymbols.has(x.symbol)) return x;
   const period=futuresPeriod(interval); x.futuresPeriod=period;
   try{
-    const data=await fetchFutures(`/futures/data/takerlongshortRatio?symbol=${encodeURIComponent(x.symbol)}&period=${period}&limit=1`);
-    const d=Array.isArray(data)?data[data.length-1]:null;
-    if(d){const b=Number(d.buyVol),s=Number(d.sellVol),t=b+s;x.futuresBuy=t>0?b/t*100:NaN;x.futuresSell=t>0?s/t*100:NaN;x.decision=applyFutures(x.decision,x,threshold)}
-  }catch(e){/* Futures confirmation is optional */}
+    const data=await fetchFutures(`/futures/data/takerlongshortRatio?symbol=${encodeURIComponent(x.symbol)}&period=${period}&limit=3`);
+    if(Array.isArray(data)&&data.length){
+      let b=0,s=0;
+      for(const d of data){ b+=Number(d.buyVol)||0; s+=Number(d.sellVol)||0; }
+      const total=b+s;
+      x.futuresBuy=total>0?b/total*100:NaN;
+      x.futuresSell=total>0?s/total*100:NaN;
+
+      const d=data[data.length-1];
+      const lb=Number(d.buyVol)||0, ls=Number(d.sellVol)||0, lt=lb+ls;
+      x.futuresLatestBuy=lt>0?lb/lt*100:NaN;
+      x.futuresLatestSell=lt>0?ls/lt*100:NaN;
+
+      x.decision=applyFutures(x.decision,x,threshold);
+      x.launch=scoreLaunch(x,threshold);
+      x.launchScore=x.launch.score;
+      x.launchRank=x.launch.rank;
+      Object.assign(x,buildManualContext(x,threshold));
+      x.narrative=buildNarrative(x);
+    }
+  }catch(e){/* Futures confirmation optional */}
   return x;
 }
 
 async function runScan(){
- if(scanning)return; scanning=true;$("scanBtn").disabled=true;$("scanBtn").textContent="جاري السكان...";$("bar").style.width="0%";rows=[];render();
- const interval=$("interval").value,threshold=Number($("threshold").value)||55,useFutures=$("futuresMode").value==="on";
- try{
-  $("status").textContent="جلب أزواج Spot وFutures...";const symbols=await getUniverse();$("sTotal").textContent=symbols.length;
-  let cursor=0,done=0,failed=0;const concurrency=6;
-  async function worker(){while(cursor<symbols.length){const sym=symbols[cursor++];try{const x=await scanSpot(sym,interval,threshold);rows.push(x)}catch(e){failed++;if(String(e.message).includes("RATE_LIMIT"))await sleep(1800)}finally{done++;$("bar").style.width=`${done/symbols.length*78}%`;$("status").textContent=`Spot: ${done}/${symbols.length}${failed?` — تعذر ${failed}`:""}`;if(done%15===0)render()}await sleep(35)}}
-  await Promise.all(Array.from({length:concurrency},worker));
-  if(useFutures){
-    // Same manual logic: Futures is a confirmation step, not the primary scanner.
-    const candidates=rows.filter(x=>x.decision.type!=="mix" || x.spotBuy>=threshold || x.spotSell>=threshold);
-    let fDone=0,fCursor=0;$("status").textContent=`Spot اكتمل. تأكيد Futures لـ ${candidates.length} مرشح...`;
-    async function fworker(){while(fCursor<candidates.length){const x=candidates[fCursor++];await addFutures(x,interval,threshold);fDone++;$("bar").style.width=`${78+(fDone/Math.max(1,candidates.length))*22}%`;$("status").textContent=`Futures confirmation: ${fDone}/${candidates.length}`;if(fDone%8===0)render();await sleep(45)}}
-    await Promise.all(Array.from({length:4},fworker));
+  if(scanning)return;
+  scanning=true; $("scanBtn").disabled=true; $("scanBtn").textContent="جاري السكان...";
+  $("bar").style.width="0%"; rows=[]; render();
+
+  const interval=$("interval").value;
+  const threshold=Number($("threshold").value)||55;
+  const useFutures=$("futuresMode").value==="on";
+
+  try{
+    $("status").textContent="جلب أزواج Spot وFutures...";
+    const symbols=await getUniverse();
+    $("sTotal").textContent=symbols.length;
+
+    let cursor=0,done=0,failed=0;
+    const concurrency=6;
+
+    async function worker(){
+      while(cursor<symbols.length){
+        const sym=symbols[cursor++];
+        try{
+          const x=await scanSpot(sym,interval,threshold);
+          rows.push(x);
+        }catch(e){
+          failed++;
+          if(String(e.message).includes("RATE_LIMIT")) await sleep(1800);
+        }finally{
+          done++;
+          $("bar").style.width=`${done/symbols.length*76}%`;
+          $("status").textContent=`Spot: ${done}/${symbols.length}${failed?` — تعذر ${failed}`:""}`;
+          if(done%15===0) render();
+        }
+        await sleep(35);
+      }
+    }
+    await Promise.all(Array.from({length:concurrency},worker));
+
+    if(useFutures){
+      // Confirm all potentially interesting/ambiguous rows, including absorption and current flips.
+      const candidates=rows.filter(x=>
+        x.decision.type!=="mix" ||
+        x.launchScore>=45 ||
+        x.spotBuy>=threshold || x.spotSell>=threshold ||
+        x.currentBuy>=threshold || x.currentSell>=threshold
+      );
+      let fDone=0,fCursor=0;
+      $("status").textContent=`Spot اكتمل. تأكيد Futures لـ ${candidates.length} مرشح...`;
+
+      async function fworker(){
+        while(fCursor<candidates.length){
+          const x=candidates[fCursor++];
+          await addFutures(x,interval,threshold);
+          fDone++;
+          $("bar").style.width=`${76+(fDone/Math.max(1,candidates.length))*24}%`;
+          $("status").textContent=`Futures confirmation: ${fDone}/${candidates.length}`;
+          if(fDone%8===0) render();
+          await sleep(45);
+        }
+      }
+      await Promise.all(Array.from({length:4},fworker));
+    }
+
+    $("bar").style.width="100%";
+    $("sTime").textContent=new Date().toLocaleString("ar-SA");
+    $("status").textContent=`اكتمل السكان: ${rows.length} زوج. النتيجة تجمع Spot + تسلسل الشموع + السعر + الفوليوم${useFutures?" + Futures":""}.`;
+    render();
+  }catch(e){
+    console.error(e);
+    $("status").textContent="تعذر الاتصال بـ Binance. جرّب مرة أخرى أو افحص وصول Binance API من شبكتك.";
+  }finally{
+    scanning=false; $("scanBtn").disabled=false; $("scanBtn").textContent="ابدأ السكان";
   }
-  $("bar").style.width="100%";$("sTime").textContent=new Date().toLocaleString("ar-SA");$("status").textContent=`اكتمل السكان: ${rows.length} زوج. الحكم مبني على 3 شموع Spot + السعر + الفوليوم${useFutures?" + Futures confirmation":""}.`;render();
- }catch(e){console.error(e);$("status").textContent="تعذر الاتصال بـ Binance. جرّب مرة أخرى أو افحص وصول Binance API من شبكتك."}
- finally{scanning=false;$("scanBtn").disabled=false;$("scanBtn").textContent="ابدأ السكان"}
 }
 
-function filtered(){const q=$("search").value.trim().toUpperCase(),min=Number($("minVolume").value)||0;return rows.filter(x=>(activeFilter==="all"||x.decision.type===activeFilter)&&x.windowVol>=min&&(!q||x.symbol.includes(q)))}
+function filtered(){
+  const q=$("search").value.trim().toUpperCase();
+  const min=Number($("minVolume").value)||0;
+  return rows.filter(x=>{
+    const typeOk=activeFilter==="all" ||
+      (activeFilter==="launch" ? x.launchScore>=40 :
+      (activeFilter==="manual" ? x.manualNeeded : x.decision.type===activeFilter));
+    return typeOk && x.windowVol>=min && (!q||x.symbol.includes(q));
+  });
+}
+
 function render(){
- $("sBuy").textContent=rows.filter(x=>x.decision.type==="buy").length;$("sSell").textContent=rows.filter(x=>x.decision.type==="sell").length;$("sAbsorb").textContent=rows.filter(x=>x.decision.type==="absorb").length;$("sMix").textContent=rows.filter(x=>x.decision.type==="mix").length;
- const data=filtered().sort((a,b)=>{let av=sortKey==="verdictRank"?a.decision.rank:a[sortKey],bv=sortKey==="verdictRank"?b.decision.rank:b[sortKey];if(typeof av==="string")return sortDir*av.localeCompare(bv);return sortDir*((av??-Infinity)-(bv??-Infinity))});
- const tb=$("tbody");if(!data.length){tb.innerHTML='<tr><td colspan="12" class="small">لا توجد نتائج مطابقة.</td></tr>';return}
- tb.innerHTML=data.map(x=>{const d=x.decision,cls=d.type==="buy"?"buy":d.type==="sell"?"sell":d.type==="absorb"?"absorb":"mix";const vr=x.volStandout?`بارز ×${x.volRatio.toFixed(2)}`:`×${x.volRatio.toFixed(2)}`;const fp=Number.isFinite(x.futuresBuy)?`${x.futuresBuy.toFixed(1)}% <span class="small">(${x.futuresPeriod})</span>`:"—";return `<tr><td class="sym">${x.symbol.replace(/USDT$/,"/USDT")}</td><td class="buy">${x.spotBuy.toFixed(1)}%</td><td class="sell">${x.spotSell.toFixed(1)}%</td><td class="${x.currentBuy>=50?"buy":"sell"}">${x.currentBuy.toFixed(1)}%</td><td class="${x.windowChange>=0?"pos":"neg"}">${pct(x.windowChange,2)}</td><td>${fmt(x.windowVol,0)}</td><td class="${x.volStandout?"absorb":""}">${vr}</td><td><span class="tag">${x.location}</span></td><td>${fp}</td><td>${priceFmt(x.price)}</td><td><span class="badge ${cls}">${d.label}</span></td><td class="reason">${d.reason}</td></tr>`}).join("");
+  $("sBuy").textContent=rows.filter(x=>x.decision.type==="buy").length;
+  $("sSell").textContent=rows.filter(x=>x.decision.type==="sell").length;
+  $("sAbsorb").textContent=rows.filter(x=>x.decision.type==="absorb").length;
+  $("sMix").textContent=rows.filter(x=>x.decision.type==="mix").length;
+  $("sManual").textContent=rows.filter(x=>x.manualNeeded).length;
+  $("sLaunch").textContent=rows.filter(x=>x.launchScore>=78 && x.launch.label.includes("قريب")).length;
+  const best=rows.length?[...rows].sort((a,b)=>b.launchScore-a.launchScore)[0]:null;
+  $("sBest").textContent=best?`${best.symbol.replace(/USDT$/,"")} ${best.launchScore}/100`:"—";
+
+  let baseData=filtered();
+  if(activeFilter==="launch"){
+    baseData=[...baseData].sort((a,b)=>b.launchScore-a.launchScore).slice(0,20);
+  }
+  const data=baseData.sort((a,b)=>{
+    let av=sortKey==="verdictRank"?a.decision.rank:
+      sortKey==="manualNeeded"?(a.manualNeeded?1:0):
+      sortKey==="launchRank"?a.launch.rank:a[sortKey];
+    let bv=sortKey==="verdictRank"?b.decision.rank:
+      sortKey==="manualNeeded"?(b.manualNeeded?1:0):
+      sortKey==="launchRank"?b.launch.rank:b[sortKey];
+    if(typeof av==="string") return sortDir*av.localeCompare(bv);
+    return sortDir*((av??-Infinity)-(bv??-Infinity));
+  });
+
+  const tb=$("tbody");
+  if(!data.length){
+    tb.innerHTML='<tr><td colspan="17" class="small">لا توجد نتائج مطابقة.</td></tr>';
+    return;
+  }
+
+  tb.innerHTML=data.map(x=>{
+    const d=x.decision;
+    const cls=d.type==="buy"?"buy":d.type==="sell"?"sell":d.type==="absorb"?"absorb":"mix";
+    const seq=x.last3Buys.map(b=>`<span class="${b>=50?"buy":"sell"}">${b.toFixed(1)}%</span>`).join(" ← ");
+    const fp=Number.isFinite(x.futuresBuy)?`${x.futuresBuy.toFixed(1)}% <span class="small">(${x.futuresPeriod})</span>`:"—";
+    const fl=Number.isFinite(x.futuresLatestBuy)?`${x.futuresLatestBuy.toFixed(1)}%`:"—";
+    const manual=x.manualNeeded?`<span class="badge manual">🟠 نعم</span>`:`<span class="badge buy">لا</span>`;
+    return `<tr>
+      <td class="sym">${x.symbol.replace(/USDT$/,"/USDT")}</td>
+      <td><span class="score ${x.launchScore>=78?"rocket":x.launch.label.includes("متأخر")?"late":""}">${x.launchScore}/100</span></td>
+      <td><span class="badge ${x.launchScore>=78?"buy":x.launch.label.includes("متأخر")?"manual":"mix"}">${x.launch.label}</span><div class="small" style="white-space:normal;min-width:220px;margin-top:5px">${x.launch.reason}</div></td>
+      <td class="buy">${x.spotBuy.toFixed(1)}%</td>
+      <td>${seq}</td>
+      <td class="${x.currentBuy>=50?"buy":"sell"}">${x.currentBuy.toFixed(1)}%</td>
+      <td class="${x.windowChange>=0?"pos":"neg"}">${pct(x.windowChange,2)}</td>
+      <td>${fmt(x.windowVol,0)}</td>
+      <td class="${x.volStandout?"absorb":""}">${x.volRatio.toFixed(2)}×</td>
+      <td><span class="tag">${x.location}</span></td>
+      <td>${fp}</td>
+      <td>${fl}</td>
+      <td>${priceFmt(x.price)}</td>
+      <td><span class="badge ${cls}">${d.label}</span></td>
+      <td>${manual}</td>
+      <td class="reason">${x.narrative}</td>
+      <td class="manualHint">${x.manualHint}</td>
+    </tr>`;
+  }).join("");
 }
 
-$("scanBtn").addEventListener("click",runScan);$("search").addEventListener("input",render);$("minVolume").addEventListener("input",render);
-document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");activeFilter=b.dataset.filter;render()}));
-document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.sort;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=k==="symbol"?1:-1}render()}));
+$("scanBtn").addEventListener("click",runScan);
+$("search").addEventListener("input",render);
+$("minVolume").addEventListener("input",render);
+
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); activeFilter=b.dataset.filter;
+  if(activeFilter==="launch"){ sortKey="launchScore"; sortDir=-1; }
+  render();
+}));
+
+document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{
+  const k=th.dataset.sort;
+  if(sortKey===k) sortDir*=-1;
+  else{sortKey=k;sortDir=k==="symbol"?1:-1}
+  render();
+}));
 </script>
 </body>
 </html>
