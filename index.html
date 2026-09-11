@@ -1,363 +1,173 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Binance Taker Scanner</title>
-  <style>
-    :root{
-      --bg:#0b1020; --panel:#121933; --panel2:#0f1630; --text:#eef2ff;
-      --muted:#9aa4c7; --line:#253052; --green:#25d07f; --red:#ff5f6d;
-      --yellow:#f4c95d; --blue:#6ea8fe; --chip:#1a2344;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    .wrap{max-width:1450px;margin:auto;padding:18px}
-    h1{font-size:1.55rem;margin:0 0 6px}
-    .sub{color:var(--muted);font-size:.95rem;margin-bottom:16px;line-height:1.7}
-    .controls{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;background:var(--panel);padding:14px;border:1px solid var(--line);border-radius:14px}
-    label{font-size:.78rem;color:var(--muted);display:block;margin-bottom:6px}
-    select,input,button{width:100%;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:10px;padding:10px;font-size:.92rem}
-    button{cursor:pointer;background:#2b62f4;border-color:#2b62f4;font-weight:700}
-    button:disabled{opacity:.55;cursor:not-allowed}
-    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:12px 0}
-    .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
-    .stat .k{color:var(--muted);font-size:.78rem}.stat .v{font-size:1.15rem;font-weight:800;margin-top:3px}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-    .tab{width:auto;padding:8px 12px;background:var(--chip);border-color:var(--line)}
-    .tab.active{background:#314475}
-    .status{color:var(--muted);font-size:.9rem;margin:8px 0 12px;min-height:22px}
-    .progress{height:7px;background:var(--panel);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
-    .progress > div{height:100%;width:0;background:var(--blue);transition:width .15s}
-    .tableWrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
-    table{width:100%;border-collapse:collapse;min-width:1050px}
-    th,td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:.86rem;text-align:center;white-space:nowrap}
-    th{position:sticky;top:0;background:#151e3e;z-index:2;color:#cbd5ff;cursor:pointer}
-    tr:hover td{background:#151e33}
-    .sym{font-weight:800;text-align:right}
-    .buy{color:var(--green);font-weight:800}.sell{color:var(--red);font-weight:800}.mix{color:var(--yellow);font-weight:800}
-    .pos{color:var(--green)}.neg{color:var(--red)}
-    .badge{display:inline-block;border-radius:999px;padding:4px 8px;background:var(--chip)}
-    .note{margin-top:12px;color:var(--muted);font-size:.82rem;line-height:1.7}
-    .small{font-size:.76rem;color:var(--muted)}
-    @media(max-width:900px){
-      .controls{grid-template-columns:repeat(2,1fr)}
-      .stats{grid-template-columns:repeat(2,1fr)}
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Binance Manual Flow Scanner</title>
+<style>
+:root{--bg:#08101e;--panel:#111a2e;--panel2:#0d1629;--line:#263450;--text:#edf3ff;--muted:#9caccc;--green:#32d583;--red:#ff6675;--yellow:#f5c75f;--blue:#72a7ff;--purple:#b899ff;--chip:#192541}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}.wrap{max-width:1600px;margin:auto;padding:18px}h1{font-size:1.55rem;margin:0 0 6px}.sub,.note{color:var(--muted);line-height:1.75}.sub{font-size:.92rem;margin-bottom:14px}.controls{display:grid;grid-template-columns:repeat(6,minmax(125px,1fr));gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}label{display:block;font-size:.77rem;color:var(--muted);margin-bottom:6px}select,input,button{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:.9rem}button{cursor:pointer;font-weight:750;background:#285eea;border-color:#285eea}button:disabled{opacity:.55;cursor:not-allowed}.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin:12px 0}.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px}.stat .k{font-size:.74rem;color:var(--muted)}.stat .v{font-size:1.08rem;font-weight:850;margin-top:4px}.buy{color:var(--green)!important}.sell{color:var(--red)!important}.absorb{color:var(--yellow)!important}.mix{color:#c8d2e9!important}.progress{height:7px;background:var(--panel);border:1px solid var(--line);border-radius:99px;overflow:hidden}.progress>div{height:100%;width:0;background:var(--blue);transition:width .15s}.status{min-height:24px;margin:8px 0 10px;color:var(--muted);font-size:.88rem}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.tab{width:auto;padding:8px 11px;background:var(--chip);border-color:var(--line)}.tab.active{background:#30466f}.tableWrap{overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px}table{border-collapse:collapse;width:100%;min-width:1550px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);font-size:.82rem;text-align:center;white-space:nowrap}th{position:sticky;top:0;z-index:2;background:#14203a;color:#d4def5;cursor:pointer}tr:hover td{background:#142035}.sym{text-align:right;font-weight:850}.pos{color:var(--green)}.neg{color:var(--red)}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--chip);font-weight:800}.reason{white-space:normal;min-width:300px;text-align:right;line-height:1.55}.small{font-size:.74rem;color:var(--muted)}.legend{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.legend>div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px;font-size:.78rem;line-height:1.55}.note{font-size:.8rem;margin-top:12px}.tag{font-size:.72rem;padding:2px 6px;border-radius:999px;background:var(--chip)}
+@media(max-width:1000px){.controls{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.legend{grid-template-columns:1fr 1fr}}
+</style>
 </head>
 <body>
 <div class="wrap">
-  <h1>ماسح Taker Buy / Sell — Binance Spot</h1>
-  <div class="sub">
-    نفس حساب THE/USDT: نسبة الشراء = Taker Buy Quote Volume ÷ Quote Volume × 100.
-    لا توجد متوسطات، RSI، MACD أو أي مؤشرات إضافية.
-  </div>
+<h1>ماسح Binance — نفس التحليل اليدوي</h1>
+<div class="sub">يفحص جميع أزواج Spot/USDT بنفس منطق تحليل THE: يجمع آخر <b>3 شموع مكتملة</b> (جمع مباشر، بدون متوسط)، يحسب Taker Buy/Sell من Quote Volume، يراقب استجابة السعر، يقارن فوليوم آخر شمعة بالشمعتين السابقتين، ويفحص Futures Taker Buy/Sell كعامل تأكيد عندما تتوفر عقود للزوج.</div>
 
-  <div class="controls">
-    <div>
-      <label>الفريم</label>
-      <select id="interval">
-        <option>1m</option><option>3m</option><option selected>5m</option><option>15m</option>
-        <option>30m</option><option>1h</option><option>2h</option><option>4h</option>
-        <option>6h</option><option>8h</option><option>12h</option><option>1d</option>
-      </select>
-    </div>
-    <div>
-      <label>الشمعة</label>
-      <select id="candleMode">
-        <option value="closed" selected>آخر شمعة مكتملة</option>
-        <option value="current">الشمعة الحالية</option>
-      </select>
-    </div>
-    <div>
-      <label>حد الإشارة %</label>
-      <input id="threshold" type="number" min="50" max="99" step="1" value="60">
-    </div>
-    <div>
-      <label>أقل فوليوم USDT للعرض</label>
-      <input id="minVolume" type="number" min="0" step="1000" value="0">
-    </div>
-    <div>
-      <label>بحث عن عملة</label>
-      <input id="search" placeholder="مثال: THE">
-    </div>
-    <div style="align-self:end">
-      <button id="scanBtn">ابدأ السكان</button>
-    </div>
-  </div>
+<div class="controls">
+  <div><label>الفريم</label><select id="interval"><option>1m</option><option>3m</option><option selected>5m</option><option>15m</option><option>30m</option><option>1h</option><option>2h</option><option>4h</option><option>6h</option><option>8h</option><option>12h</option><option>1d</option></select></div>
+  <div><label>حد الهيمنة الواضحة</label><select id="threshold"><option value="55" selected>55%</option><option value="60">60%</option><option value="65">65%</option><option value="70">70%</option></select></div>
+  <div><label>أقل فوليوم للنافذة (USDT)</label><input id="minVolume" type="number" min="0" step="1000" value="0"></div>
+  <div><label>بحث عن عملة</label><input id="search" placeholder="مثال: THE"></div>
+  <div><label>تأكيد العقود</label><select id="futuresMode"><option value="on" selected>تشغيل Futures confirmation</option><option value="off">Spot فقط</option></select></div>
+  <div style="align-self:end"><button id="scanBtn">ابدأ السكان</button></div>
+</div>
 
-  <div class="stats">
-    <div class="stat"><div class="k">الأزواج المفحوصة</div><div id="sTotal" class="v">—</div></div>
-    <div class="stat"><div class="k">شراء قوي</div><div id="sBuy" class="v buy">—</div></div>
-    <div class="stat"><div class="k">بيع قوي</div><div id="sSell" class="v sell">—</div></div>
-    <div class="stat"><div class="k">مختلط</div><div id="sMix" class="v mix">—</div></div>
-    <div class="stat"><div class="k">آخر تحديث</div><div id="sTime" class="v" style="font-size:.95rem">—</div></div>
-  </div>
+<div class="stats">
+  <div class="stat"><div class="k">المفحوص</div><div id="sTotal" class="v">—</div></div>
+  <div class="stat"><div class="k">شراء واضح</div><div id="sBuy" class="v buy">—</div></div>
+  <div class="stat"><div class="k">تصريف واضح</div><div id="sSell" class="v sell">—</div></div>
+  <div class="stat"><div class="k">امتصاص</div><div id="sAbsorb" class="v absorb">—</div></div>
+  <div class="stat"><div class="k">مختلط</div><div id="sMix" class="v mix">—</div></div>
+  <div class="stat"><div class="k">آخر تحديث</div><div id="sTime" class="v" style="font-size:.86rem">—</div></div>
+</div>
+<div class="progress"><div id="bar"></div></div><div id="status" class="status">اختر الفريم ثم ابدأ السكان.</div>
 
-  <div class="progress"><div id="bar"></div></div>
-  <div id="status" class="status">اختر الفريم واضغط «ابدأ السكان».</div>
+<div class="legend">
+  <div><b class="buy">🟢 شراء واضح</b><br>هيمنة شراء Spot + السعر يستجيب للأعلى + نشاط فوليوم مناسب، والعقود لا تعاكس بقوة.</div>
+  <div><b class="sell">🔴 تصريف واضح</b><br>هيمنة بيع Spot + السعر يستجيب للأسفل + نشاط فوليوم مناسب، والعقود لا تعاكس بقوة.</div>
+  <div><b class="absorb">🟡 امتصاص</b><br>هيمنة قوية لكن السعر لا يتحرك معها؛ مثال: 65% شراء والسعر لا يصعد = احتمال بائع يمتص الشراء.</div>
+  <div><b>⚪ مختلط</b><br>النسبة والسعر أو Spot وFutures لا يعطون اتجاهًا متفقًا.</div>
+</div>
 
-  <div class="tabs">
-    <button class="tab active" data-filter="all">الكل</button>
-    <button class="tab" data-filter="buy">شراء قوي</button>
-    <button class="tab" data-filter="sell">بيع قوي</button>
-    <button class="tab" data-filter="mix">مختلط</button>
-  </div>
+<div class="tabs">
+  <button class="tab active" data-filter="all">الكل</button><button class="tab" data-filter="buy">شراء واضح</button><button class="tab" data-filter="sell">تصريف واضح</button><button class="tab" data-filter="absorb">امتصاص</button><button class="tab" data-filter="mix">مختلط</button>
+</div>
 
-  <div class="tableWrap">
-    <table>
-      <thead>
-        <tr>
-          <th data-sort="symbol">العملة</th>
-          <th data-sort="buyPct">Buy %</th>
-          <th data-sort="sellPct">Sell %</th>
-          <th data-sort="delta">Delta %</th>
-          <th data-sort="quoteVol">الفوليوم USDT</th>
-          <th data-sort="changePct">تغير الشمعة %</th>
-          <th data-sort="close">السعر</th>
-          <th data-sort="trades">عدد الصفقات</th>
-          <th data-sort="signal">الإشارة</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"><tr><td colspan="9" class="small">لا توجد بيانات بعد.</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="note">
-    ملاحظة: الفوليوم المعروض هو قيمة تداول الشمعة بالـUSDT نفسها، بدون مقارنته بمتوسطات.
-    «شراء قوي» يعني Buy% أكبر من أو يساوي الحد الذي تختاره، و«بيع قوي» يعني Sell% أكبر من أو يساوي الحد.
-    الشمعة الحالية تتغير لحظيًا، لذلك آخر شمعة مكتملة أكثر ثباتًا.
-  </div>
+<div class="tableWrap"><table><thead><tr>
+<th data-sort="symbol">العملة</th><th data-sort="spotBuy">Spot Buy<br><span class="small">3 شموع</span></th><th data-sort="spotSell">Spot Sell</th><th data-sort="currentBuy">الشمعة الحالية<br>Buy</th><th data-sort="windowChange">حركة السعر<br>3 شموع</th><th data-sort="windowVol">فوليوم النافذة<br>USDT</th><th data-sort="volRatio">فوليوم آخر شمعة<br>مقارنة بالسابق</th><th>الموقع السعري</th><th data-sort="futuresBuy">Futures Buy</th><th data-sort="price">السعر</th><th data-sort="verdictRank">الحكم</th><th>السبب</th>
+</tr></thead><tbody id="tbody"><tr><td colspan="12" class="small">لا توجد بيانات بعد.</td></tr></tbody></table></div>
+<div class="note"><b>مهم:</b> لا يوجد أي متوسط فوليوم في الحساب. فوليوم آخر شمعة يُقارن مباشرة بالشمعتين المكتملتين قبلها. نافذة Spot = مجموع آخر 3 شموع مكتملة. إذا اخترت 5m فهذا يعادل آخر 15 دقيقة مكتملة، وهو نفس النوع من القراءة الذي استخدمته يدويًا مع THE. بيانات Futures تدعم فترات 5m فأعلى؛ عند اختيار 1m أو 3m يستخدم التأكيد 5m فقط.</div>
 </div>
 
 <script>
-const BASES = [
-  "https://api.binance.com",
-  "https://api1.binance.com",
-  "https://api2.binance.com",
-  "https://api3.binance.com"
-];
+const SPOT_BASES=["https://api.binance.com","https://api1.binance.com","https://api2.binance.com","https://api3.binance.com"];
+const FUT_BASE="https://fapi.binance.com";
+let rows=[],activeFilter="all",sortKey="verdictRank",sortDir=-1,scanning=false,futuresSymbols=new Set();
+const $=id=>document.getElementById(id); const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
-let rows = [];
-let activeFilter = "all";
-let sortKey = "strength";
-let sortDir = -1;
-let scanning = false;
+async function fetchSpot(path){let err;for(const b of SPOT_BASES){try{const r=await fetch(b+path,{cache:"no-store"});if(r.status===418||r.status===429)throw new Error("RATE_LIMIT");if(!r.ok)throw new Error("HTTP "+r.status);return await r.json()}catch(e){err=e}}throw err||new Error("Spot unavailable")}
+async function fetchFutures(path){const r=await fetch(FUT_BASE+path,{cache:"no-store"});if(r.status===418||r.status===429)throw new Error("RATE_LIMIT");if(!r.ok)throw new Error("HTTP "+r.status);return await r.json()}
+function fmt(n,d=1){return Number.isFinite(n)?new Intl.NumberFormat("en-US",{maximumFractionDigits:d}).format(n):"—"}
+function priceFmt(n){if(!Number.isFinite(n))return"—";if(n>=100)return n.toFixed(2);if(n>=1)return n.toFixed(4);if(n>=.01)return n.toFixed(6);return n.toFixed(8)}
+function pct(n,d=1){return Number.isFinite(n)?`${n>=0?"+":""}${n.toFixed(d)}%`:"—"}
+function kObj(c){return{open:Number(c[1]),high:Number(c[2]),low:Number(c[3]),close:Number(c[4]),baseVol:Number(c[5]),quoteVol:Number(c[7]),trades:Number(c[8]),takerBuyQuote:Number(c[10]),openTime:c[0],closeTime:c[6]}}
+function buyPct(c){return c.quoteVol>0?c.takerBuyQuote/c.quoteVol*100:0}
+function futuresPeriod(interval){const map={"1m":"5m","3m":"5m","5m":"5m","15m":"15m","30m":"30m","1h":"1h","2h":"2h","4h":"4h","6h":"6h","8h":"6h","12h":"12h","1d":"1d"};return map[interval]||"5m"}
 
-const $ = id => document.getElementById(id);
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function getUniverse(){
+  const [spot,fut]=await Promise.all([
+    fetchSpot("/api/v3/exchangeInfo"),
+    fetchFutures("/fapi/v1/exchangeInfo").catch(()=>({symbols:[]}))
+  ]);
+  futuresSymbols=new Set((fut.symbols||[]).filter(s=>s.status==="TRADING"&&s.quoteAsset==="USDT"&&s.contractType==="PERPETUAL").map(s=>s.symbol));
+  return spot.symbols.filter(s=>s.status==="TRADING"&&s.quoteAsset==="USDT"&&s.isSpotTradingAllowed!==false).map(s=>s.symbol);
+}
 
-async function fetchJSON(path) {
-  let lastErr;
-  for (const base of BASES) {
-    try {
-      const r = await fetch(base + path, {cache:"no-store"});
-      if (r.status === 429 || r.status === 418) {
-        throw new Error("RATE_LIMIT_" + r.status);
-      }
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      return await r.json();
-    } catch (e) {
-      lastErr = e;
-    }
+function spotDecision(x,threshold){
+  const buyDom=x.spotBuy>=threshold, sellDom=x.spotSell>=threshold;
+  const priceUp=x.windowChange>0 || x.breakout, priceDown=x.windowChange<0 || x.breakdown;
+  const currentBuy=x.currentBuy>=threshold, currentSell=x.currentSell>=threshold;
+  const volActive=x.volStandout || x.currentVolAlreadyLarge;
+  if(buyDom && !priceUp) return {type:"absorb",dir:"sellrisk",rank:2,label:"🟡 امتصاص شراء",reason:"شراء هجومي قوي لكن السعر لا يستجيب للأعلى؛ احتمال بائع يمتص الشراء"};
+  if(sellDom && !priceDown) return {type:"absorb",dir:"buyrisk",rank:2,label:"🟡 امتصاص بيع",reason:"بيع هجومي قوي لكن السعر لا يستجيب للأسفل؛ احتمال مشترٍ يمتص البيع"};
+  if(buyDom && priceUp && volActive) return {type:"buy",dir:"buy",rank:4,label:"🟢 شراء واضح",reason:"Spot شراء مهيمن + السعر صاعد + الفوليوم نشط"};
+  if(sellDom && priceDown && volActive) return {type:"sell",dir:"sell",rank:4,label:"🔴 تصريف واضح",reason:"Spot بيع مهيمن + السعر هابط + الفوليوم نشط"};
+  if(buyDom && priceUp && currentBuy) return {type:"buy",dir:"buy",rank:3,label:"🟢 شراء واضح",reason:"Spot شراء مهيمن + السعر صاعد + الشمعة الحالية تؤكد الشراء"};
+  if(sellDom && priceDown && currentSell) return {type:"sell",dir:"sell",rank:3,label:"🔴 تصريف واضح",reason:"Spot بيع مهيمن + السعر هابط + الشمعة الحالية تؤكد البيع"};
+  return {type:"mix",dir:"mix",rank:1,label:"⚪ مختلط",reason:"النسبة والسعر/الفوليوم لا يعطون تأكيدًا متفقًا"};
+}
+
+function applyFutures(dec,x,threshold){
+  if(!Number.isFinite(x.futuresBuy)) return dec;
+  const fb=x.futuresBuy, fs=100-fb;
+  if(dec.dir==="buy"){
+    if(fs>=threshold) return {type:"mix",dir:"mix",rank:1,label:"⚪ مختلط",reason:dec.reason+"، لكن Futures يميل بقوة للبيع"};
+    if(fb>=threshold) return {...dec,rank:5,reason:dec.reason+" + Futures يؤكد الشراء"};
+    return {...dec,reason:dec.reason+" + Futures محايد تقريبًا"};
   }
-  throw lastErr || new Error("تعذر الاتصال بـ Binance");
+  if(dec.dir==="sell"){
+    if(fb>=threshold) return {type:"mix",dir:"mix",rank:1,label:"⚪ مختلط",reason:dec.reason+"، لكن Futures يميل بقوة للشراء"};
+    if(fs>=threshold) return {...dec,rank:5,reason:dec.reason+" + Futures يؤكد البيع"};
+    return {...dec,reason:dec.reason+" + Futures محايد تقريبًا"};
+  }
+  return dec;
 }
 
-function formatNum(n, digits=2){
-  if (!Number.isFinite(n)) return "—";
-  return new Intl.NumberFormat("en-US",{maximumFractionDigits:digits}).format(n);
-}
-function formatPrice(n){
-  if (!Number.isFinite(n)) return "—";
-  if (n >= 100) return n.toFixed(2);
-  if (n >= 1) return n.toFixed(4);
-  if (n >= .01) return n.toFixed(6);
-  return n.toFixed(8);
-}
-function signalFor(buyPct, sellPct, threshold){
-  if (buyPct >= threshold) return "buy";
-  if (sellPct >= threshold) return "sell";
-  return "mix";
-}
-function signalLabel(s){
-  return s==="buy" ? "🟢 شراء قوي" : s==="sell" ? "🔴 بيع قوي" : "🟡 مختلط";
-}
-
-async function getSymbols(){
-  const info = await fetchJSON("/api/v3/exchangeInfo");
-  return info.symbols
-    .filter(s =>
-      s.status === "TRADING" &&
-      s.quoteAsset === "USDT" &&
-      s.isSpotTradingAllowed !== false
-    )
-    .map(s => s.symbol);
+async function scanSpot(symbol,interval,threshold){
+  // 6 candles: 5 completed context candles + current candle.
+  const raw=await fetchSpot(`/api/v3/klines?symbol=${encodeURIComponent(symbol)}&interval=${encodeURIComponent(interval)}&limit=6`);
+  if(!Array.isArray(raw)||raw.length<5)throw new Error("not enough candles");
+  const ks=raw.map(kObj), current=ks[ks.length-1], closed=ks.slice(0,-1);
+  const last3=closed.slice(-3), prev2=closed.slice(-5,-3);
+  const windowVol=last3.reduce((s,c)=>s+c.quoteVol,0), windowBuy=last3.reduce((s,c)=>s+c.takerBuyQuote,0);
+  const spotBuy=windowVol>0?windowBuy/windowVol*100:0, spotSell=100-spotBuy;
+  const currentBuy=buyPct(current), currentSell=100-currentBuy;
+  const start=last3[0].open, price=current.close, windowChange=start>0?(price-start)/start*100:0;
+  const priorHigh=Math.max(...last3.map(c=>c.high)), priorLow=Math.min(...last3.map(c=>c.low));
+  const breakout=price>priorHigh, breakdown=price<priorLow;
+  const latest=last3[2], older1=last3[1], older2=last3[0];
+  const prevMax=Math.max(older1.quoteVol,older2.quoteVol), volRatio=prevMax>0?latest.quoteVol/prevMax:0;
+  const volStandout=latest.quoteVol>older1.quoteVol && latest.quoteVol>older2.quoteVol;
+  const currentVolAlreadyLarge=current.quoteVol>latest.quoteVol && current.quoteVol>older1.quoteVol;
+  const location=breakout?"اختراق أعلى النطاق":breakdown?"كسر أسفل النطاق":price>=priorHigh*.998?"قرب أعلى النطاق":price<=priorLow*1.002?"قرب أسفل النطاق":"داخل النطاق";
+  const x={symbol,spotBuy,spotSell,currentBuy,currentSell,windowChange,windowVol,latestVol:latest.quoteVol,volRatio,volStandout,currentVolAlreadyLarge,currentVol:current.quoteVol,price,breakout,breakdown,priorHigh,priorLow,location,futuresBuy:NaN,futuresSell:NaN,futuresPeriod:"—"};
+  x.decision=spotDecision(x,threshold); return x;
 }
 
-async function scanSymbol(symbol, interval, candleMode, threshold){
-  const k = await fetchJSON(`/api/v3/klines?symbol=${encodeURIComponent(symbol)}&interval=${encodeURIComponent(interval)}&limit=2`);
-  if (!Array.isArray(k) || k.length < 2) throw new Error("لا توجد شموع كافية");
-  const c = candleMode === "current" ? k[k.length-1] : k[k.length-2];
-
-  // Binance spot kline:
-  // 0 open time, 1 open, 2 high, 3 low, 4 close, 5 base volume,
-  // 7 quote volume, 8 trades, 9 taker buy base, 10 taker buy quote.
-  const open = Number(c[1]);
-  const close = Number(c[4]);
-  const quoteVol = Number(c[7]);
-  const trades = Number(c[8]);
-  const takerBuyQuote = Number(c[10]);
-
-  const buyPct = quoteVol > 0 ? (takerBuyQuote / quoteVol) * 100 : 0;
-  const sellPct = 100 - buyPct;
-  const delta = buyPct - sellPct;
-  const changePct = open > 0 ? ((close-open)/open)*100 : 0;
-  const signal = signalFor(buyPct, sellPct, threshold);
-
-  return {
-    symbol, buyPct, sellPct, delta, quoteVol, changePct, close, trades,
-    signal,
-    strength: Math.max(buyPct, sellPct),
-    openTime: c[0], closeTime: c[6]
-  };
+async function addFutures(x,interval,threshold){
+  if(!futuresSymbols.has(x.symbol))return x;
+  const period=futuresPeriod(interval); x.futuresPeriod=period;
+  try{
+    const data=await fetchFutures(`/futures/data/takerlongshortRatio?symbol=${encodeURIComponent(x.symbol)}&period=${period}&limit=1`);
+    const d=Array.isArray(data)?data[data.length-1]:null;
+    if(d){const b=Number(d.buyVol),s=Number(d.sellVol),t=b+s;x.futuresBuy=t>0?b/t*100:NaN;x.futuresSell=t>0?s/t*100:NaN;x.decision=applyFutures(x.decision,x,threshold)}
+  }catch(e){/* Futures confirmation is optional */}
+  return x;
 }
 
 async function runScan(){
-  if (scanning) return;
-  scanning = true;
-  $("scanBtn").disabled = true;
-  $("scanBtn").textContent = "جاري السكان...";
-  $("bar").style.width = "0%";
-  rows = [];
-  render();
-
-  const interval = $("interval").value;
-  const candleMode = $("candleMode").value;
-  const threshold = Math.max(50, Math.min(99, Number($("threshold").value) || 60));
-
-  try {
-    $("status").textContent = "جلب قائمة أزواج USDT من Binance...";
-    const symbols = await getSymbols();
-    $("sTotal").textContent = symbols.length;
-
-    let done = 0, failed = 0;
-    const concurrency = 8;
-    let cursor = 0;
-
-    async function worker(){
-      while(cursor < symbols.length){
-        const i = cursor++;
-        const sym = symbols[i];
-        try{
-          const r = await scanSymbol(sym, interval, candleMode, threshold);
-          rows.push(r);
-        }catch(e){
-          failed++;
-          if(String(e.message).includes("RATE_LIMIT")){
-            $("status").textContent = "Binance قيّد الطلبات مؤقتًا. تهدئة المسح قبل الاستمرار...";
-            await sleep(2500);
-          }
-        }finally{
-          done++;
-          $("bar").style.width = `${(done/symbols.length)*100}%`;
-          $("status").textContent = `تم فحص ${done} من ${symbols.length}${failed ? ` — تعذر ${failed}` : ""}`;
-          if(done % 12 === 0) render();
-        }
-        await sleep(25);
-      }
-    }
-
-    await Promise.all(Array.from({length:concurrency}, worker));
-    $("sTime").textContent = new Date().toLocaleString("ar-SA");
-    $("status").textContent = `اكتمل السكان: ${rows.length} زوج بنجاح${failed ? `، وتعذر ${failed}` : ""}.`;
-    render();
-  } catch(e){
-    console.error(e);
-    $("status").textContent = "تعذر الاتصال بـ Binance. جرّب مرة أخرى أو تأكد أن Binance API متاح في شبكتك.";
-  } finally {
-    scanning = false;
-    $("scanBtn").disabled = false;
-    $("scanBtn").textContent = "ابدأ السكان";
+ if(scanning)return; scanning=true;$("scanBtn").disabled=true;$("scanBtn").textContent="جاري السكان...";$("bar").style.width="0%";rows=[];render();
+ const interval=$("interval").value,threshold=Number($("threshold").value)||55,useFutures=$("futuresMode").value==="on";
+ try{
+  $("status").textContent="جلب أزواج Spot وFutures...";const symbols=await getUniverse();$("sTotal").textContent=symbols.length;
+  let cursor=0,done=0,failed=0;const concurrency=6;
+  async function worker(){while(cursor<symbols.length){const sym=symbols[cursor++];try{const x=await scanSpot(sym,interval,threshold);rows.push(x)}catch(e){failed++;if(String(e.message).includes("RATE_LIMIT"))await sleep(1800)}finally{done++;$("bar").style.width=`${done/symbols.length*78}%`;$("status").textContent=`Spot: ${done}/${symbols.length}${failed?` — تعذر ${failed}`:""}`;if(done%15===0)render()}await sleep(35)}}
+  await Promise.all(Array.from({length:concurrency},worker));
+  if(useFutures){
+    // Same manual logic: Futures is a confirmation step, not the primary scanner.
+    const candidates=rows.filter(x=>x.decision.type!=="mix" || x.spotBuy>=threshold || x.spotSell>=threshold);
+    let fDone=0,fCursor=0;$("status").textContent=`Spot اكتمل. تأكيد Futures لـ ${candidates.length} مرشح...`;
+    async function fworker(){while(fCursor<candidates.length){const x=candidates[fCursor++];await addFutures(x,interval,threshold);fDone++;$("bar").style.width=`${78+(fDone/Math.max(1,candidates.length))*22}%`;$("status").textContent=`Futures confirmation: ${fDone}/${candidates.length}`;if(fDone%8===0)render();await sleep(45)}}
+    await Promise.all(Array.from({length:4},fworker));
   }
+  $("bar").style.width="100%";$("sTime").textContent=new Date().toLocaleString("ar-SA");$("status").textContent=`اكتمل السكان: ${rows.length} زوج. الحكم مبني على 3 شموع Spot + السعر + الفوليوم${useFutures?" + Futures confirmation":""}.`;render();
+ }catch(e){console.error(e);$("status").textContent="تعذر الاتصال بـ Binance. جرّب مرة أخرى أو افحص وصول Binance API من شبكتك."}
+ finally{scanning=false;$("scanBtn").disabled=false;$("scanBtn").textContent="ابدأ السكان"}
 }
 
-function filteredRows(){
-  const minVol = Number($("minVolume").value) || 0;
-  const q = $("search").value.trim().toUpperCase();
-  return rows.filter(r =>
-    (activeFilter==="all" || r.signal===activeFilter) &&
-    r.quoteVol >= minVol &&
-    (!q || r.symbol.includes(q))
-  );
-}
-
+function filtered(){const q=$("search").value.trim().toUpperCase(),min=Number($("minVolume").value)||0;return rows.filter(x=>(activeFilter==="all"||x.decision.type===activeFilter)&&x.windowVol>=min&&(!q||x.symbol.includes(q)))}
 function render(){
-  const threshold = Math.max(50, Math.min(99, Number($("threshold").value) || 60));
-
-  // Reclassify immediately if user changes threshold after scanning
-  rows.forEach(r => {
-    r.signal = signalFor(r.buyPct, r.sellPct, threshold);
-    r.strength = Math.max(r.buyPct, r.sellPct);
-  });
-
-  $("sBuy").textContent = rows.filter(r=>r.signal==="buy").length || "0";
-  $("sSell").textContent = rows.filter(r=>r.signal==="sell").length || "0";
-  $("sMix").textContent = rows.filter(r=>r.signal==="mix").length || "0";
-
-  const data = filteredRows().sort((a,b)=>{
-    let av=a[sortKey], bv=b[sortKey];
-    if(sortKey==="signal"){
-      const rank={buy:3,sell:2,mix:1}; av=rank[av]; bv=rank[bv];
-    }
-    if(typeof av === "string") return sortDir * av.localeCompare(bv);
-    return sortDir * ((av??0)-(bv??0));
-  });
-
-  const tb = $("tbody");
-  if(!data.length){
-    tb.innerHTML = `<tr><td colspan="9" class="small">لا توجد نتائج مطابقة.</td></tr>`;
-    return;
-  }
-
-  tb.innerHTML = data.map(r => `
-    <tr>
-      <td class="sym">${r.symbol.replace(/USDT$/,"/USDT")}</td>
-      <td class="buy">${r.buyPct.toFixed(1)}%</td>
-      <td class="sell">${r.sellPct.toFixed(1)}%</td>
-      <td class="${r.delta>=0?"pos":"neg"}">${r.delta>=0?"+":""}${r.delta.toFixed(1)}%</td>
-      <td>${formatNum(r.quoteVol,0)}</td>
-      <td class="${r.changePct>=0?"pos":"neg"}">${r.changePct>=0?"+":""}${r.changePct.toFixed(2)}%</td>
-      <td>${formatPrice(r.close)}</td>
-      <td>${formatNum(r.trades,0)}</td>
-      <td><span class="badge ${r.signal}">${signalLabel(r.signal)}</span></td>
-    </tr>
-  `).join("");
+ $("sBuy").textContent=rows.filter(x=>x.decision.type==="buy").length;$("sSell").textContent=rows.filter(x=>x.decision.type==="sell").length;$("sAbsorb").textContent=rows.filter(x=>x.decision.type==="absorb").length;$("sMix").textContent=rows.filter(x=>x.decision.type==="mix").length;
+ const data=filtered().sort((a,b)=>{let av=sortKey==="verdictRank"?a.decision.rank:a[sortKey],bv=sortKey==="verdictRank"?b.decision.rank:b[sortKey];if(typeof av==="string")return sortDir*av.localeCompare(bv);return sortDir*((av??-Infinity)-(bv??-Infinity))});
+ const tb=$("tbody");if(!data.length){tb.innerHTML='<tr><td colspan="12" class="small">لا توجد نتائج مطابقة.</td></tr>';return}
+ tb.innerHTML=data.map(x=>{const d=x.decision,cls=d.type==="buy"?"buy":d.type==="sell"?"sell":d.type==="absorb"?"absorb":"mix";const vr=x.volStandout?`بارز ×${x.volRatio.toFixed(2)}`:`×${x.volRatio.toFixed(2)}`;const fp=Number.isFinite(x.futuresBuy)?`${x.futuresBuy.toFixed(1)}% <span class="small">(${x.futuresPeriod})</span>`:"—";return `<tr><td class="sym">${x.symbol.replace(/USDT$/,"/USDT")}</td><td class="buy">${x.spotBuy.toFixed(1)}%</td><td class="sell">${x.spotSell.toFixed(1)}%</td><td class="${x.currentBuy>=50?"buy":"sell"}">${x.currentBuy.toFixed(1)}%</td><td class="${x.windowChange>=0?"pos":"neg"}">${pct(x.windowChange,2)}</td><td>${fmt(x.windowVol,0)}</td><td class="${x.volStandout?"absorb":""}">${vr}</td><td><span class="tag">${x.location}</span></td><td>${fp}</td><td>${priceFmt(x.price)}</td><td><span class="badge ${cls}">${d.label}</span></td><td class="reason">${d.reason}</td></tr>`}).join("");
 }
 
-$("scanBtn").addEventListener("click", runScan);
-$("search").addEventListener("input", render);
-$("minVolume").addEventListener("input", render);
-$("threshold").addEventListener("input", render);
-
-document.querySelectorAll(".tab").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-    btn.classList.add("active");
-    activeFilter=btn.dataset.filter;
-    render();
-  });
-});
-
-document.querySelectorAll("th[data-sort]").forEach(th=>{
-  th.addEventListener("click",()=>{
-    const k=th.dataset.sort;
-    if(sortKey===k) sortDir*=-1;
-    else { sortKey=k; sortDir = (k==="symbol" ? 1 : -1); }
-    render();
-  });
-});
+$("scanBtn").addEventListener("click",runScan);$("search").addEventListener("input",render);$("minVolume").addEventListener("input",render);
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");activeFilter=b.dataset.filter;render()}));
+document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.sort;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=k==="symbol"?1:-1}render()}));
 </script>
 </body>
 </html>
