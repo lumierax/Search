@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Binance Flow Scanner — Launch Radar + Telegram</title>
+<title>Binance Futures Scanner — Highest Signal Only</title>
 <style>
 :root{
   --bg:#08101e;--panel:#111a2e;--panel2:#0d1629;--line:#263450;--text:#edf3ff;
@@ -40,7 +40,7 @@ tr:hover td{background:#142035}.sym{text-align:right;font-weight:850}.pos{color:
 </head>
 <body>
 <div class="wrap">
-<h1>ماسح Binance — رادار قرب الانطلاق + تنبيهات Telegram</h1>
+<h1>ماسح Binance Futures — أعلى إشارة فقط</h1>
 <div class="sub">
 يفحص جميع أزواج <b>Spot/USDT</b> بنفس تسلسل القراءة اليدوية: آخر 3 شموع مكتملة مجمعة مباشرة، كل شمعة منفردة، الشمعة الحالية، استجابة السعر، موقع السعر داخل النطاق، فوليوم آخر شمعة مقارنة مباشرة بالشمعتين قبلها، ثم Futures Taker Buy/Sell كعامل تأكيد. <b>لا توجد متوسطات فوليوم.</b>
 </div>
@@ -116,73 +116,39 @@ tr:hover td{background:#142035}.sym{text-align:right;font-weight:850}.pos{color:
   </div>
 </div>
 
+
 <div class="notifyBox">
-  <div style="font-weight:850;margin-bottom:8px">🔔 التنبيهات — Telegram / Webhook</div>
+  <div style="font-weight:850;margin-bottom:8px">🤖 ربط ماسحك ببوت TradeHub</div>
   <div class="small" style="line-height:1.7;margin-bottom:10px">
-    Telegram المباشر يحفظ Bot Token وChat ID داخل متصفحك فقط (localStorage) ولا يضيفهما إلى GitHub.
-    وضع Webhook يرسل JSON مثل TradingView إلى الرابط الذي تضعه. التنبيهات تعمل أثناء فتح الصفحة وتشغيل السكان.
+    بعد اكتمال السكان، الصفحة تختار <b>أعلى إشارة Futures صالحة فقط</b> وترسل صفقة واحدة للبوت.
+    لا ترسل باقي الإشارات. إذا البوت مشغول بصفقة مفتوحة أو إشارة تنتظر موافقتك، سيرفض الإشارة الجديدة.
   </div>
   <div class="notifyGrid">
     <div>
-      <label>تشغيل التنبيهات</label>
+      <label>تشغيل إرسال أعلى إشارة</label>
       <select id="notifyEnabled">
         <option value="on">تشغيل</option>
         <option value="off" selected>إيقاف</option>
       </select>
     </div>
     <div>
-      <label>طريقة الإرسال</label>
-      <select id="notifyMode">
-        <option value="telegram" selected>Telegram مباشر</option>
-        <option value="webhook">Webhook مثل TradingView</option>
-        <option value="both">الاثنان</option>
-      </select>
+      <label>رابط البوت الأساسي</label>
+      <input id="botBaseUrl" autocomplete="off" placeholder="https://YOUR-BOT.up.railway.app">
     </div>
     <div>
-      <label>أقل درجة قرب الارتفاع</label>
-      <input id="alertMinScore" type="number" min="0" max="100" value="78">
+      <label>Webhook Secret</label>
+      <input id="botWebhookSecret" type="password" autocomplete="off" placeholder="نفس WEBHOOK_SECRET في Railway">
     </div>
     <div>
-      <label>منع تكرار نفس العملة (دقيقة)</label>
-      <input id="alertCooldown" type="number" min="1" max="1440" value="30">
-    </div>
-
-    <div>
-      <label>Telegram Bot Token</label>
-      <input id="tgToken" type="password" autocomplete="off" placeholder="123456:ABC...">
-    </div>
-    <div>
-      <label>Telegram Chat ID</label>
-      <input id="tgChatId" autocomplete="off" placeholder="مثال: 123456789 أو -100...">
-    </div>
-    <div style="grid-column:span 2">
-      <label>Webhook URL (اختياري)</label>
-      <input id="webhookUrl" autocomplete="off" placeholder="https://example.com/webhook">
-    </div>
-
-    <div>
-      <label>تنبيه 🚀 قرب الانطلاق</label>
-      <select id="alertLaunch"><option value="on" selected>نعم</option><option value="off">لا</option></select>
-    </div>
-    <div>
-      <label>تنبيه 🟢 شراء واضح</label>
-      <select id="alertBuy"><option value="on" selected>نعم</option><option value="off">لا</option></select>
-    </div>
-    <div>
-      <label>تنبيه 🔴 تصريف واضح</label>
-      <select id="alertSell"><option value="off" selected>لا</option><option value="on">نعم</option></select>
-    </div>
-    <div>
-      <label>تنبيه 🟡 امتصاص</label>
-      <select id="alertAbsorb"><option value="off" selected>لا</option><option value="on">نعم</option></select>
+      <label>Cooldown لنفس الإشارة (دقيقة)</label>
+      <input id="alertCooldown" type="number" min="1" max="1440" value="20">
     </div>
   </div>
   <div class="notifyActions">
-    <button id="saveNotifyBtn" class="secondary">حفظ إعدادات التنبيه</button>
-    <button id="testTelegramBtn" class="secondary">اختبار Telegram</button>
-    <button id="testWebhookBtn" class="secondary">اختبار Webhook</button>
+    <button id="saveNotifyBtn" class="secondary">حفظ إعدادات الربط</button>
+    <button id="testBotBtn" class="secondary">اختبار اتصال البوت</button>
   </div>
-  <div id="notifyStatus" class="small" style="margin-top:8px">التنبيهات متوقفة.</div>
+  <div id="notifyStatus" class="small" style="margin-top:8px">الإرسال للبوت متوقف.</div>
 </div>
 
 <div class="stats">
@@ -280,15 +246,11 @@ function loadTradeSettings(){
   }
 }
 
-const NOTIFY_KEYS=[
-  "notifyEnabled","notifyMode","alertMinScore","alertCooldown","tgToken","tgChatId","webhookUrl",
-  "alertLaunch","alertBuy","alertSell","alertAbsorb"
-];
+const NOTIFY_KEYS=["notifyEnabled","botBaseUrl","botWebhookSecret","alertCooldown"];
 
 function loadNotifySettings(){
   for(const k of NOTIFY_KEYS){
-    const el=$(k);
-    if(!el) continue;
+    const el=$(k); if(!el) continue;
     const v=localStorage.getItem("bfs_"+k);
     if(v!==null) el.value=v;
   }
@@ -297,158 +259,170 @@ function loadNotifySettings(){
 
 function saveNotifySettings(){
   for(const k of NOTIFY_KEYS){
-    const el=$(k);
-    if(el) localStorage.setItem("bfs_"+k,el.value);
+    const el=$(k); if(el) localStorage.setItem("bfs_"+k,el.value);
   }
-  updateNotifyStatus("تم حفظ إعدادات التنبيه على هذا الجهاز.");
+  updateNotifyStatus("تم حفظ ربط البوت على هذا الجهاز.");
 }
 
 function updateNotifyStatus(msg=""){
   const el=$("notifyStatus"); if(!el) return;
   if(msg){ el.textContent=msg; return; }
-  const on=$("notifyEnabled")?.value==="on";
-  const mode=$("notifyMode")?.value||"telegram";
-  el.textContent=on ? `التنبيهات مفعلة — الوضع: ${mode}` : "التنبيهات متوقفة.";
+  el.textContent=$("notifyEnabled")?.value==="on"
+    ? "إرسال أعلى إشارة فقط مفعّل."
+    : "الإرسال للبوت متوقف.";
 }
 
-function tgSend(text){
-  const token=$("tgToken").value.trim();
-  const chatId=$("tgChatId").value.trim();
-  if(!token||!chatId) throw new Error("أدخل Bot Token وChat ID");
-  // Browser-safe fire-and-forget request. Credentials are never embedded in GitHub files.
-  const qs=new URLSearchParams({
-    chat_id:chatId,
-    text,
-    disable_web_page_preview:"true"
-  });
-  const url=`https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage?${qs.toString()}`;
-  return new Promise((resolve)=>{
-    const img=new Image();
-    const done=()=>resolve(true);
-    img.onload=done; img.onerror=done;
-    img.src=url;
-    setTimeout(done,1800);
-  });
+function botUrl(path=""){
+  const base=$("botBaseUrl")?.value.trim().replace(/\/+$/,"");
+  if(!base) throw new Error("أدخل رابط البوت الأساسي");
+  return base+path;
 }
 
-async function webhookSend(payload){
-  const url=$("webhookUrl").value.trim();
-  if(!url) throw new Error("أدخل Webhook URL");
-  try{
-    await fetch(url,{
-      method:"POST",
-      mode:"cors",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(payload)
-    });
-    return true;
-  }catch(e){
-    // Fallback fire-and-forget for endpoints that accept simple POSTs but do not expose CORS response headers.
-    try{
-      await fetch(url,{
-        method:"POST",
-        mode:"no-cors",
-        headers:{"Content-Type":"text/plain;charset=UTF-8"},
-        body:JSON.stringify(payload)
-      });
-      return true;
-    }catch(e2){
-      throw e2;
-    }
+async function testBotConnection(){
+  const r=await fetch(botUrl("/health"),{cache:"no-store"});
+  const data=await r.json().catch(()=>({}));
+  if(!r.ok || !data.ok) throw new Error(data.error||`HTTP ${r.status}`);
+  return data;
+}
+
+async function sendSignalToBot(payload){
+  const secret=$("botWebhookSecret")?.value.trim();
+  if(!secret) throw new Error("أدخل Webhook Secret");
+
+  const r=await fetch(botUrl("/signal"),{
+    method:"POST",
+    mode:"cors",
+    headers:{
+      "Content-Type":"application/json",
+      "X-Webhook-Secret":secret
+    },
+    body:JSON.stringify(payload)
+  });
+
+  const data=await r.json().catch(()=>({}));
+  if(!r.ok){
+    const err=new Error(data.error||data.message||`HTTP ${r.status}`);
+    err.data=data;
+    throw err;
   }
+  return data;
 }
 
-function cooldownKey(symbol,interval,kind){
-  return `bfs_alert_${interval}_${symbol}_${kind}`;
-}
-function canAlert(symbol,interval,kind){
-  const mins=Math.max(1,Number($("alertCooldown").value)||30);
-  const k=cooldownKey(symbol,interval,kind);
-  const last=Number(localStorage.getItem(k)||0);
-  return Date.now()-last >= mins*60*1000;
-}
-function stampAlert(symbol,interval,kind){
-  localStorage.setItem(cooldownKey(symbol,interval,kind),String(Date.now()));
+function highestSignalCandidate(){
+  const minScore=Number($("minFuturesScore")?.value)||65;
+  const mode=$("marketMode")?.value||"futures_both";
+
+  const valid=rows.filter(x=>{
+    if(!x.futuresSignal || !x.tradePlan) return false;
+    if(x.futuresScore < minScore) return false;
+    if(x.tradePlan.tooWide) return false;
+    if(x.futuresSignal.side!=="long" && x.futuresSignal.side!=="short") return false;
+    if(mode==="futures_long" && x.futuresSignal.side!=="long") return false;
+    if(mode==="futures_short" && x.futuresSignal.side!=="short") return false;
+    if(mode==="spot") return false;
+
+    // Avoid treating liquidation/covering alone as a fresh directional entry.
+    if($("oiMode")?.value!=="off"){
+      if(x.futuresSignal.side==="long" && x.futuresRegime==="Short covering") return false;
+      if(x.futuresSignal.side==="short" && x.futuresRegime==="Long liquidation") return false;
+    }
+    return true;
+  });
+
+  valid.sort((a,b)=>{
+    if(b.futuresScore!==a.futuresScore) return b.futuresScore-a.futuresScore;
+    // Tie-breaker: prefer stronger Spot confirmation.
+    const ac=a.futuresSignal.side==="long"?a.spotBuy:a.spotSell;
+    const bc=b.futuresSignal.side==="long"?b.spotBuy:b.spotSell;
+    return bc-ac;
+  });
+
+  return valid[0]||null;
 }
 
-function alertKind(x){
-  const minScore=Math.max(0,Math.min(100,Number($("alertMinScore").value)||78));
-  if($("alertLaunch").value==="on" && x.launchScore>=minScore && x.launch.label.includes("قريب")) return "launch";
-  if($("alertBuy").value==="on" && x.decision.type==="buy") return "buy";
-  if($("alertSell").value==="on" && x.decision.type==="sell") return "sell";
-  if($("alertAbsorb").value==="on" && x.decision.type==="absorb") return "absorb";
-  return null;
-}
-
-function buildAlertPayload(x,interval,kind){
-  const title = kind==="launch" ? "🚀 قريب من الانطلاق" :
-                kind==="buy" ? "🟢 شراء واضح" :
-                kind==="sell" ? "🔴 تصريف واضح" : "🟡 امتصاص";
-  const text=[
-    `${title} — ${x.symbol.replace(/USDT$/,"/USDT")}`,
-    `الفريم: ${interval}`,
-    `السعر: ${priceFmt(x.price)}`,
-    `درجة قرب الارتفاع: ${x.launchScore}/100`,
-    `Spot: Buy ${x.spotBuy.toFixed(1)}% / Sell ${x.spotSell.toFixed(1)}%`,
-    `الحالية: Buy ${x.currentBuy.toFixed(1)}% / Sell ${x.currentSell.toFixed(1)}%`,
-    `حركة السعر: ${x.windowChange>=0?"+":""}${x.windowChange.toFixed(2)}%`,
-    `فوليوم آخر شمعة: ${x.volRatio.toFixed(2)}× من أكبر الشمعتين قبلها`,
-    Number.isFinite(x.futuresBuy) ? `Futures: Buy ${x.futuresBuy.toFixed(1)}% / Sell ${x.futuresSell.toFixed(1)}%` : `Futures: غير متوفر`,
-    `الحكم: ${x.decision.label}`,
-    `السبب: ${x.launch.reason}`
-  ].join("\n");
-
+function scannerSignalPayload(x,interval){
+  const side=x.futuresSignal.side;
+  const action=side==="long"?"BUY":"SELL";
   return {
-    event:kind,
+    source:"tradehub-scanner",
+    action,
+    direction:side==="long"?"LONG":"SHORT",
     symbol:x.symbol,
     interval,
-    timestamp:new Date().toISOString(),
-    price:x.price,
+    price:Number(x.futuresPrice||x.price),
+    futures_score:x.futuresScore,
     launch_score:x.launchScore,
     spot_buy_pct:Number(x.spotBuy.toFixed(2)),
     spot_sell_pct:Number(x.spotSell.toFixed(2)),
-    current_buy_pct:Number(x.currentBuy.toFixed(2)),
-    current_sell_pct:Number(x.currentSell.toFixed(2)),
-    price_change_pct:Number(x.windowChange.toFixed(3)),
-    volume_ratio:Number(x.volRatio.toFixed(3)),
     futures_buy_pct:Number.isFinite(x.futuresBuy)?Number(x.futuresBuy.toFixed(2)):null,
     futures_sell_pct:Number.isFinite(x.futuresSell)?Number(x.futuresSell.toFixed(2)):null,
-    futures_score:x.futuresScore||0,
-    futures_side:x.futuresSignal?.side||null,
     oi_change_pct:Number.isFinite(x.oiChangePct)?Number(x.oiChangePct.toFixed(3)):null,
-    futures_regime:x.futuresRegime||null,
-    trade_plan:x.tradePlan||null,
-    verdict:x.decision.label,
-    launch_label:x.launch.label,
-    reason:x.launch.reason,
-    text
+    futures_regime:x.futuresRegime,
+    reason:x.futuresSignal.reason,
+    trade_plan:{
+      side,
+      entry:Number(x.tradePlan.entry),
+      target:Number(x.tradePlan.target),
+      sl:Number(x.tradePlan.sl),
+      breakeven:Number(x.tradePlan.breakeven),
+      risk_pct:Number(x.tradePlan.riskPct.toFixed(3)),
+      net_target_pct:Number(x.tradePlan.netPct.toFixed(3))
+    }
   };
 }
 
-async function maybeSendAlerts(interval){
-  if($("notifyEnabled").value!=="on") return {sent:0,failed:0};
-  const mode=$("notifyMode").value;
-  let sent=0,failed=0;
-
-  const candidates=[...rows].sort((a,b)=>b.launchScore-a.launchScore);
-  for(const x of candidates){
-    const kind=alertKind(x);
-    if(!kind || !canAlert(x.symbol,interval,kind)) continue;
-    const payload=buildAlertPayload(x,interval,kind);
-    try{
-      if(mode==="telegram"||mode==="both") await tgSend(payload.text);
-      if(mode==="webhook"||mode==="both") await webhookSend(payload);
-      stampAlert(x.symbol,interval,kind);
-      sent++;
-      await sleep(120);
-    }catch(e){
-      failed++;
-      console.error("Alert failed",x.symbol,e);
-    }
-  }
-  return {sent,failed};
+function singleSignalCooldownKey(x,interval){
+  return `bfs_one_${interval}_${x.symbol}_${x.futuresSignal.side}`;
 }
 
+function canSendSingleSignal(x,interval){
+  const mins=Math.max(1,Number($("alertCooldown")?.value)||20);
+  const last=Number(localStorage.getItem(singleSignalCooldownKey(x,interval))||0);
+  return Date.now()-last >= mins*60*1000;
+}
+
+function stampSingleSignal(x,interval){
+  localStorage.setItem(singleSignalCooldownKey(x,interval),String(Date.now()));
+}
+
+async function sendHighestSignalOnly(interval){
+  if($("notifyEnabled")?.value!=="on") return {sent:0,reason:"disabled"};
+
+  const top=highestSignalCandidate();
+  if(!top) return {sent:0,reason:"no_candidate"};
+
+  if(!canSendSingleSignal(top,interval)){
+    return {sent:0,reason:"cooldown",symbol:top.symbol,score:top.futuresScore};
+  }
+
+  const payload=scannerSignalPayload(top,interval);
+
+  try{
+    const response=await sendSignalToBot(payload);
+    // Stamp only when the bot actually accepted the signal.
+    if(response.accepted || response.ok){
+      stampSingleSignal(top,interval);
+      return {
+        sent:1,
+        symbol:top.symbol,
+        side:top.futuresSignal.side,
+        score:top.futuresScore,
+        response
+      };
+    }
+    return {sent:0,reason:"not_accepted",response};
+  }catch(e){
+    const busy=e?.data?.busy===true;
+    return {
+      sent:0,
+      reason:busy?"bot_busy":"error",
+      error:e.message,
+      data:e.data||null,
+      symbol:top.symbol,
+      score:top.futuresScore
+    };
+  }
+}
 
 async function fetchSpot(path){
   let err;
@@ -1072,11 +1046,22 @@ async function runScan(){
     $("sTime").textContent=new Date().toLocaleString("ar-SA");
     render();
 
-    const alerts=await maybeSendAlerts(interval);
-    const alertTxt = $("notifyEnabled").value==="on"
-      ? ` — تنبيهات: أرسل ${alerts.sent}${alerts.failed?`، فشل ${alerts.failed}`:""}`
-      : "";
-    $("status").textContent=`اكتمل السكان: ${rows.length} زوج. النتيجة تجمع Spot + تسلسل الشموع + السعر + الفوليوم${useFutures?" + Futures":""}${alertTxt}.`;
+    const one=await sendHighestSignalOnly(interval);
+    let alertTxt="";
+    if($("notifyEnabled").value==="on"){
+      if(one.sent){
+        alertTxt=` — أُرسلت أعلى إشارة فقط: ${one.symbol} ${one.side.toUpperCase()} ${one.score}/100`;
+      }else if(one.reason==="bot_busy"){
+        alertTxt=` — البوت مشغول بصفقة/إشارة حالية، لم تُرسل إشارة جديدة`;
+      }else if(one.reason==="cooldown"){
+        alertTxt=` — أعلى إشارة ${one.symbol} ضمن Cooldown`;
+      }else if(one.reason==="no_candidate"){
+        alertTxt=` — لا توجد إشارة Futures صالحة`;
+      }else if(one.reason==="error"){
+        alertTxt=` — فشل الإرسال للبوت: ${one.error}`;
+      }
+    }
+    $("status").textContent=`اكتمل السكان: ${rows.length} زوج. أعلى إشارة فقط${alertTxt}.`;
   }catch(e){
     console.error(e);
     $("status").textContent="تعذر الاتصال بـ Binance. جرّب مرة أخرى أو افحص وصول Binance API من شبكتك.";
@@ -1095,7 +1080,7 @@ function filtered(){
       (activeFilter==="long" ? x.futuresSignal?.side==="long" && x.futuresScore>=minFS :
       (activeFilter==="short" ? x.futuresSignal?.side==="short" && x.futuresScore>=minFS :
       (activeFilter==="launch" ? x.launchScore>=40 :
-      (activeFilter==="manual" ? x.manualNeeded : x.decision.type===activeFilter))));
+      (activeFilter==="manual" ? x.manualNeeded : x.decision.type===activeFilter)))));
     return typeOk && x.windowVol>=min && (!q||x.symbol.includes(q));
   });
 }
@@ -1204,31 +1189,16 @@ document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("clic
 
 $("saveNotifyBtn").addEventListener("click",saveNotifySettings);
 
-$("testTelegramBtn").addEventListener("click",async()=>{
+$("testBotBtn").addEventListener("click",async()=>{
   try{
-    await tgSend("✅ اختبار تنبيه Binance Launch Radar\nإذا وصلتك هذه الرسالة فإعداد Telegram يعمل.");
-    updateNotifyStatus("تم إرسال طلب الاختبار إلى Telegram — تحقق من المحادثة.");
+    const d=await testBotConnection();
+    updateNotifyStatus(`✅ البوت متصل — DRY_RUN=${d.dryRun} — Busy=${d.busy?"YES":"NO"}`);
   }catch(e){
-    updateNotifyStatus("خطأ Telegram: "+e.message);
-  }
-});
-
-$("testWebhookBtn").addEventListener("click",async()=>{
-  try{
-    await webhookSend({
-      event:"test",
-      source:"Binance Launch Radar",
-      timestamp:new Date().toISOString(),
-      text:"✅ Webhook test from Binance Launch Radar"
-    });
-    updateNotifyStatus("تم إرسال اختبار Webhook.");
-  }catch(e){
-    updateNotifyStatus("خطأ Webhook: "+e.message);
+    updateNotifyStatus("❌ فشل اتصال البوت: "+e.message);
   }
 });
 
 $("notifyEnabled").addEventListener("change",()=>{saveNotifySettings();});
-$("notifyMode").addEventListener("change",()=>{saveNotifySettings();});
 window.addEventListener("DOMContentLoaded",()=>{loadTradeSettings();loadNotifySettings();});
 </script>
 </body>
